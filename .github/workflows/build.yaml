@@ -20,7 +20,6 @@ jobs:
           ./build_tools/build_detect_platform make_config.mk
           cat make_config.mk
           make static_lib -j2
-          ls
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
@@ -44,12 +43,11 @@ jobs:
           mkdir build
           cd build
           cmake -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=Release ..
-          cd ..
-          msbuild build/rocksdb.sln /m:2 /p:Configuration=Release
-          ls
+          msbuild rocksdb.sln /m:2 /p:Configuration=Release
+          ls Release
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: rocksdb_${{ runner.os }}
-          path: build/Release/rocksdb.lib
+          path: Release/rocksdb.lib
