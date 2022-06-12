@@ -27,6 +27,7 @@ jobs:
         with:
           name: rocksdb_${{ runner.os }}
           path: librocksdb.a
+          if-no-files-found: error
 
   build_rocksdb_windows:
     runs-on: windows-latest        
@@ -51,4 +52,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: rocksdb_${{ runner.os }}
-          path: Release/rocksdb.lib
+          path: build/Release/rocksdb.lib
+          if-no-files-found: error
