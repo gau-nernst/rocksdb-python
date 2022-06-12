@@ -15,21 +15,23 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Build rocksdb
+      - name: Build rocksdb (Linux and macOS)
         if: runner.os == 'Linux' || runner.os == 'macOS'
         run: |
           cd rocksdb
+          ./build_tools/build_detect_platform make_config.mk
+          cat make_config.mk
           make static_lib -j2
 
-      - name: Add msbuild to PATH
+      - name: Add msbuild to PATH (Windows)
         if: runner.os == 'Windows'
         uses: microsoft/setup-msbuild@v1.1
 
-      - name: Build rocksdb Windows
+      - name: Build rocksdb (Windows)
         if: runner.os == 'Windows'
         run: |
           cd rocksdb
           mkdir build
           cd build
           cmake -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=Release -DWITH_GFLAGS=0 -DWITH_SNAPPY=0 -DWITH_JEMALLOC=0 -DWITH_JNI=0 ..
-          msbuild rocksdb.sln /m2
+          msbuild rocksdb.sln /m:2
