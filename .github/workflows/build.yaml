@@ -2,7 +2,7 @@ name: Build
 on: push
 
 jobs:
-  build:
+  build_rocksdb:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -13,15 +13,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          submodules: recursive
+          repository: facebook/rocksdb
 
       - name: Build rocksdb (Linux and macOS)
         if: runner.os == 'Linux' || runner.os == 'macOS'
         run: |
-          cd rocksdb
           ./build_tools/build_detect_platform make_config.mk
           cat make_config.mk
           make static_lib -j2
+          ls
 
       - name: Add msbuild to PATH (Windows)
         if: runner.os == 'Windows'
@@ -30,8 +30,17 @@ jobs:
       - name: Build rocksdb (Windows)
         if: runner.os == 'Windows'
         run: |
-          cd rocksdb
           mkdir build
           cd build
-          cmake -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=Release -DWITH_GFLAGS=0 -DWITH_SNAPPY=0 -DWITH_JEMALLOC=0 -DWITH_JNI=0 ..
-          msbuild rocksdb.sln /m:2
+          cmake -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=Release ..
+          cd ..
+          msbuild build/rocksdb.sln /m:2
+          ls
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: rocksdb
+          path: |
+            librocks.a
+            build/librocks.lib
