@@ -2,12 +2,30 @@ name: Build
 on: push
 
 jobs:
-  build_rocksdb:
-    runs-on: ${{ matrix.os }}
+  build_rocksdb_linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: facebook/rocksdb
+
+      - name: Build rocksdb
+        run: |
+          make static_lib -j2
+          strip librocksdb.a
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: rocksdb_${{ runner.os }}
+          path: librocksdb.a
+          if-no-files-found: error
+
+  build_rocksdb_macos:
+    runs-on: macos-latest
     strategy:
-      fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
         arch: [x86_64, arm64]
         
     steps:
@@ -18,8 +36,6 @@ jobs:
 
       - name: Build rocksdb
         run: |
-          ./build_tools/build_detect_platform make_config.mk
-          cat make_config.mk
           make static_lib -j2
           strip librocksdb.a
         env:
@@ -29,6 +45,32 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: rocksdb_${{ runner.os }}_${{ matrix.arch }}
+          path: librocksdb.a
+          if-no-files-found: error
+
+  build_rocksdb_macos_universal:
+    needs: build_rocksdb_macos
+    runs-on: macos-latest
+    steps:
+      - name: Download x86_64 build
+        uses: actions/download-artifact@v3
+        with:
+          name: rocksdb_${{ runner.os }}_x86_64
+          path: x86_64
+
+      - name: Download arm64 build
+        uses: actions/download-artifact@v3
+        with:
+          name: rocksdb_${{ runner.os }}_arm64
+          path: arm64
+
+      - name: Create universal build
+        run: lipo -create -output librocksdb.a x86_64/librocksdb.a arm64/librocksdb.a
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: rocksdb_${{ runner.os }}
           path: librocksdb.a
           if-no-files-found: error
 
@@ -54,6 +96,6 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: rocksdb_${{ runner.os }}_x86_64
+          name: rocksdb_${{ runner.os }}
           path: build/Release/rocksdb.lib
           if-no-files-found: error
