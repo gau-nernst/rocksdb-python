@@ -38,7 +38,7 @@ jobs:
 
       - name: Build rocksdb
         run: |
-          make static_lib -j2
+          make static_lib -j3
           strip librocksdb.a
         env:
           PORTABLE: 1
@@ -51,7 +51,7 @@ jobs:
           path: librocksdb.a
           if-no-files-found: error
 
-  build_rocksdb_macos_universal:
+  create_rocksdb_macos_universal:
     needs: build_rocksdb_macos
     runs-on: macos-latest
     steps:
@@ -85,7 +85,7 @@ jobs:
         with:
           repository: facebook/rocksdb
 
-      - name: Add msbuild to PATH (Windows)
+      - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.1
 
       - name: Build rocksdb
