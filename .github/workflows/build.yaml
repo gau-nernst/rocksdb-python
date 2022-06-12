@@ -45,7 +45,7 @@ jobs:
           cd build
           cmake -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=Release ..
           cd ..
-          msbuild build/rocksdb.sln /m:2
+          msbuild build/rocksdb.sln /m:2 /p:Configuration=Release
           ls
 
       - name: Upload artifacts
