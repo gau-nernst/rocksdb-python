@@ -14,6 +14,8 @@ jobs:
         run: |
           make static_lib -j2
           strip librocksdb.a
+        env:
+          PORTABLE: 1
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
@@ -39,6 +41,7 @@ jobs:
           make static_lib -j2
           strip librocksdb.a
         env:
+          PORTABLE: 1
           ARCHFLAG: -arch ${{ matrix.arch }}
 
       - name: Upload artifacts
@@ -89,7 +92,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=Release ..
+          cmake -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=Release -DPORTABLE=1 ..
           msbuild rocksdb.sln /m:2 /p:Configuration=Release
           ls Release
 
