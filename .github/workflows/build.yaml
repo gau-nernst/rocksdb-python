@@ -92,7 +92,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=Release -DPORTABLE=1 ..
+          cmake -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=Release -DPORTABLE=1 -DROCKSDB_BUILD_SHARED=0 -DWITH_BENCHMARK_TOOLS=0 -DWITH_CORE_TOOLS=0 -DWITH_TOOLS=0 ..
           msbuild rocksdb.sln /m:2 /p:Configuration=Release
           ls Release
 
