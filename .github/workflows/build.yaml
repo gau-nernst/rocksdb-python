@@ -21,6 +21,10 @@ jobs:
           cd rocksdb
           make static_lib -j2
 
+      - name: Add msbuild to PATH
+        if: runner.os == 'Windows'
+        uses: microsoft/setup-msbuild@v1.1
+
       - name: Build rocksdb Windows
         if: runner.os == 'Windows'
         run: |
