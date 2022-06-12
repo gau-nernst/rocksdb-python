@@ -1,0 +1,31 @@
+name: Build
+on: push
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Build rocksdb
+        if: runner.os == 'Linux' || runner.os == 'macOS'
+        run: |
+          cd rocksdb
+          make static_lib -j2
+
+      - name: Build rocksdb Windows
+        if: runner.os == 'Windows'
+        run: |
+          cd rocksdb
+          mkdir build
+          cd build
+          cmake -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=Release -DWITH_GFLAGS=0 -DWITH_SNAPPY=0 -DWITH_JEMALLOC=0 -DWITH_JNI=0 ..
+          msbuild rocksdb.sln /m2
