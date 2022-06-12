@@ -20,7 +20,7 @@ jobs:
           ./build_tools/build_detect_platform make_config.mk
           cat make_config.mk
           make static_lib -j2
-          strip -s librocksdb.a
+          strip librocksdb.a
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
