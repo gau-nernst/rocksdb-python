@@ -7,7 +7,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest]
         
     steps:
       - name: Checkout
@@ -15,20 +15,31 @@ jobs:
         with:
           repository: facebook/rocksdb
 
-      - name: Build rocksdb (Linux and macOS)
-        if: runner.os == 'Linux' || runner.os == 'macOS'
+      - name: Build rocksdb
         run: |
           ./build_tools/build_detect_platform make_config.mk
           cat make_config.mk
           make static_lib -j2
           ls
 
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: rocksdb_${{ runner.os }}
+          path: librocksdb.a
+
+  build_rocksdb_windows:
+    runs-on: windows-latest        
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: facebook/rocksdb
+
       - name: Add msbuild to PATH (Windows)
-        if: runner.os == 'Windows'
         uses: microsoft/setup-msbuild@v1.1
 
-      - name: Build rocksdb (Windows)
-        if: runner.os == 'Windows'
+      - name: Build rocksdb
         run: |
           mkdir build
           cd build
@@ -40,7 +51,5 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: rocksdb
-          path: |
-            librocks.a
-            build/librocks.lib
+          name: rocksdb_${{ runner.os }}
+          path: librocksdb.lib
