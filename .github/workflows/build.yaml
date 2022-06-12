@@ -8,6 +8,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
+        arch: [x86_64, arm64]
         
     steps:
       - name: Checkout
@@ -21,11 +22,13 @@ jobs:
           cat make_config.mk
           make static_lib -j2
           strip librocksdb.a
+        env:
+          ARCHFLAG: -arch ${{ matrix.arch }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: rocksdb_${{ runner.os }}
+          name: rocksdb_${{ runner.os }}_${{ matrix.arch }}
           path: librocksdb.a
           if-no-files-found: error
 
@@ -51,6 +54,6 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: rocksdb_${{ runner.os }}
+          name: rocksdb_${{ runner.os }}_x86_64
           path: build/Release/rocksdb.lib
           if-no-files-found: error
