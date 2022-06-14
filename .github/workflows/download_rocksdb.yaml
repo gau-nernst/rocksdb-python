@@ -1,0 +1,17 @@
+name: Download rocksdb
+on: push
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
+
+    steps:
+      - name: Download rocksdb library
+        run: |
+          python download_artifacts.py --name=${{ runner.os }}
+          unzip artifact.zip
+          ls
