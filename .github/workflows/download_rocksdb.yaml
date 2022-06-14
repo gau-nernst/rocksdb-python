@@ -15,6 +15,6 @@ jobs:
 
       - name: Download rocksdb library
         run: |
-          python download_artifacts.py --name=rocksdb_${{ runner.os }}
+          python download_artifact.py --name=rocksdb_${{ runner.os }}
           unzip artifact.zip
           ls
