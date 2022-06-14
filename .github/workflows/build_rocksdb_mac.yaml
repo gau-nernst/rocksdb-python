@@ -24,6 +24,7 @@ jobs:
 
       - name: Build 3rd-party libs
         run: |
+          echo $ARCHFLAG
           make rocksdbjavastatic_deps -j3
           ls -lh *.a
 
