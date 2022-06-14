@@ -18,6 +18,7 @@ jobs:
 
       - name: Download rocksdb library
         run: |
+          gh api -H "Accept: application/vnd.github.v3+json" /repos/gau-nernst/rocksdb-python/actions/artifacts
           python download_artifact.py --name=rocksdb_${{ runner.os }}
           unzip artifact.zip
           ls
