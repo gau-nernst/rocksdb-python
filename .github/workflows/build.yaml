@@ -20,6 +20,5 @@ jobs:
         run: |
           python download_artifact.py --name=rocksdb_${{ runner.os }}
           unzip artifact.zip
-          ls -lh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
