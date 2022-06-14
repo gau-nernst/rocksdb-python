@@ -1,5 +1,4 @@
 import platform
-import subprocess
 from glob import glob
 
 from pybind11.setup_helpers import Pybind11Extension
@@ -15,16 +14,7 @@ def get_libraries():
         # for port_win.cc
         libraries.extend(["Rpcrt4", "Shlwapi"])
     else:
-        # build_detect_platform determines which 3rd-party libraries to use
-        # librocksdb.a should be built in the same environment as this script
-        cmd = "cd rocksdb && build_tools/build_detect_platform make_config.mk"
-        subprocess.run(cmd, shell=True)
-        with open("rocksdb/make_config.mk") as f:
-            for line in f:
-                if line.startswith("PLATFORM_LDFLAGS"):
-                    flags = line.split("=", 1)[1].strip().split()
-                    libraries.extend(x[2:] for x in flags)
-                    break
+        libraries.extend(["z", "bz2"])
     return libraries
 
 
