@@ -16,7 +16,6 @@ jobs:
       - name: Build rocksdb
         run: |
           make static_lib -j2
-          strip --strip-debug librocksdb.a
         env:
           PORTABLE: 1
 
