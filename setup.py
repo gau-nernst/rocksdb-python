@@ -23,7 +23,7 @@ ext_m = Pybind11Extension(
     sorted(glob("src/*.cpp")),
     include_dirs=["rocksdb/include"],
     libraries=get_libraries(),
-    library_dirs=["./"],
+    library_dirs=["."],
     define_macros=[("VERSION_INFO", __version__)],
     cxx_std=17,
 )
