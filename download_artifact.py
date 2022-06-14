@@ -17,9 +17,7 @@ def main():
         if art["name"] == args.name:
             art_id = art["id"]
             break
-    if art_id is None:
-        raise RuntimeError(f"Artifact {args.name} not found")
-
+    assert art_id is not None, f"Artifact {args.name} not found"
     subprocess.run(f"{cmd}/{art_id}/zip > artifact.zip", shell=True)
 
 
