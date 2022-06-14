@@ -1,5 +1,8 @@
 name: Build
-on: push
+on:
+  push:
+    paths:
+     - .github/workflows/build.yaml
 
 jobs:
   build_rocksdb_linux:
@@ -22,7 +25,6 @@ jobs:
         with:
           name: rocksdb_${{ runner.os }}
           path: librocksdb.a
-          if-no-files-found: error
 
   build_rocksdb_macos:
     runs-on: macos-latest
@@ -49,7 +51,6 @@ jobs:
         with:
           name: rocksdb_${{ runner.os }}_${{ matrix.arch }}
           path: librocksdb.a
-          if-no-files-found: error
 
   create_rocksdb_macos_universal:
     needs: build_rocksdb_macos
@@ -75,7 +76,6 @@ jobs:
         with:
           name: rocksdb_${{ runner.os }}
           path: librocksdb.a
-          if-no-files-found: error
 
   build_rocksdb_windows:
     runs-on: windows-latest        
@@ -101,4 +101,3 @@ jobs:
         with:
           name: rocksdb_${{ runner.os }}
           path: build/Release/rocksdb.lib
-          if-no-files-found: error
