@@ -20,7 +20,7 @@ jobs:
 
       - name: Set env variables
         run: |
-          echo "ARCHFLAG=\"-arch ${{ matrix.arch }}\"" >> $GITHUB_ENV
+          echo ARCHFLAG="-arch ${{ matrix.arch }}" >> $GITHUB_ENV
 
       - name: Build 3rd-party libs
         run: |
