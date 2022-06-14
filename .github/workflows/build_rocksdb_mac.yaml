@@ -63,7 +63,7 @@ jobs:
           do
             filename=${lib##*/}
             echo "Creating universal lib for $filename"
-            lipo -create -output $filename x86_64/$filename arm64/filename
+            lipo -create -output $filename x86_64/$filename arm64/$filename
           done
 
       - name: Upload artifacts
