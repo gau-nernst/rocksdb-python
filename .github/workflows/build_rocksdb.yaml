@@ -18,6 +18,8 @@ jobs:
           make static_lib -j2
         env:
           PORTABLE: 1
+          CFLAGS: -fPIC
+          CXXFLAGS: -fPIC
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
