@@ -17,13 +17,16 @@ jobs:
         with:
           repository: facebook/rocksdb
 
-      - name: Build rocksdb
+      - name: Build 3rd-party libs
         run: |
           make rocksdbjavastatic_deps -j3
+          ls -lh *.a
+
+      - name: Build rocksdb
+        run: |
           make static_lib -j3
           strip librocksdb.a
           cat make_config.mk
-          ls -lh *.a
         env:
           PORTABLE: 1
           ARCHFLAG: -arch ${{ matrix.arch }}
