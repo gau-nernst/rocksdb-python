@@ -2,7 +2,7 @@ name: Build rocksdb
 on:
   push:
     paths:
-     - .github/workflows/build.yaml
+     - .github/workflows/build_rocksdb.yaml
 
 jobs:
   build_rocksdb_linux:
