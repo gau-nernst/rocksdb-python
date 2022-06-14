@@ -22,3 +22,9 @@ jobs:
           unzip artifact.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install dependencies
+        run: pip install pybind11 pytest
+      
+      - name: Build
+        run: python setup.py build_ext -i
