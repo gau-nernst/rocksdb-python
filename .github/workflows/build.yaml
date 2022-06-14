@@ -29,7 +29,9 @@ jobs:
           path: rocksdb
 
       - name: Install dependencies
-        run: pip install pybind11 pytest
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          pip install pybind11 pytest
       
       - name: Build
         run: python setup.py build_ext -i
