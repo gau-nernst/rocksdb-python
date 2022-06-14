@@ -1,0 +1,30 @@
+name: Build RocksDB Linux
+on:
+  push:
+    paths:
+     - .github/workflows/build_rocksdb_linux.yaml
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: facebook/rocksdb
+
+      - name: Build rocksdb
+        run: |
+          make static_lib -j2
+          strip --strip-debug librocksdb.a
+          cat make_config.mk
+        env:
+          PORTABLE: 1
+          CFLAGS: -fPIC
+          CXXFLAGS: -fPIC
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: rocksdb_${{ runner.os }}
+          path: librocksdb.a
