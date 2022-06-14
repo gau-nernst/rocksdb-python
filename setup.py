@@ -14,7 +14,7 @@ def get_libraries():
         # for port_win.cc
         libraries.extend(["Rpcrt4", "Shlwapi"])
     else:
-        libraries.extend(["z", "bz2"])
+        libraries.extend(["bz2", "lz4", "snappy", "z", "zstd"])
     return libraries
 
 
