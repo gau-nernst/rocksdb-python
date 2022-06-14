@@ -17,6 +17,12 @@ jobs:
         with:
           repository: facebook/rocksdb
 
+      - name: Set env variables
+        run: |
+          echo "CC=/usr/bin/clang" >> $GITHUB_ENV
+          echo "CXX=/usr/bin/clang++" >> $GITHUB_ENV
+          echo "ARCHFLAG=\"-arch ${{ matrix.arch }}\"" >> $GITHUB_ENV
+
       - name: Build 3rd-party libs
         run: |
           make rocksdbjavastatic_deps -j3
@@ -29,7 +35,6 @@ jobs:
           cat make_config.mk
         env:
           PORTABLE: 1
-          ARCHFLAG: -arch ${{ matrix.arch }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
