@@ -9,8 +9,19 @@ __version__ = "0.0.1"
 
 
 libraries = ["rocksdb"]
-if not IS_WIN:
-    libraries.extend(["z", "bz2"])
+extra_win_libs = [
+    "Rpcrt4",  # for RpcStringFreeA, UuidCreateSequential, UuidToStringA
+    "Shlwapi",  # for PathIsDirectoryA, PathIsRelativeA
+]
+extra_unix_libs = [
+    "z",    # zlib
+    "bz2",  # bzip2
+]
+if IS_WIN:
+    libraries.extend(extra_win_libs)
+else:
+    libraries.extend(extra_unix_libs)
+
 ext_m = Pybind11Extension(
     "rocksdb_python",
     sorted(glob("src/*.cpp")),
