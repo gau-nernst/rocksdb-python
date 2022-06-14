@@ -17,6 +17,7 @@ jobs:
         run: |
           make static_lib -j2
           strip --strip-debug librocksdb.a
+          cat make_config.mk
         env:
           PORTABLE: 1
           CFLAGS: -fPIC
@@ -44,6 +45,7 @@ jobs:
         run: |
           make static_lib -j3
           strip librocksdb.a
+          cat make_config.mk
         env:
           PORTABLE: 1
           ARCHFLAG: -arch ${{ matrix.arch }}
