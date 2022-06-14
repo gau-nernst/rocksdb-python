@@ -25,12 +25,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Checkout rocksdb
-        uses: actions/checkout@v3
-        with:
-          repository: facebook/rocksdb
-          path: rocksdb
-
       - name: Install dependencies
         run: pip install pybind11 pytest
 
