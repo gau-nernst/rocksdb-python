@@ -1,4 +1,4 @@
-name: Download rocksdb
+name: Build
 on: push
 
 jobs:
