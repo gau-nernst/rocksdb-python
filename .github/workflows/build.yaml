@@ -34,5 +34,5 @@ jobs:
       
       - name: Build
         run: |
-        ls
-        python setup.py build_ext -i
+          ls
+          python setup.py build_ext -i
