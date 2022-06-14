@@ -15,9 +15,11 @@ jobs:
 
       - name: Build rocksdb
         run: |
+          make rocksdbjavastatic_deps -j2
           make static_lib -j2
           strip --strip-debug librocksdb.a
           cat make_config.mk
+          ls -lh *.a
         env:
           PORTABLE: 1
           CFLAGS: -fPIC
@@ -27,4 +29,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: rocksdb_${{ runner.os }}
-          path: librocksdb.a
+          path: "*.a"
