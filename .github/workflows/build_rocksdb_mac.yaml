@@ -20,6 +20,8 @@ jobs:
 
       - name: Set env variables
         run: |
+          echo CC=/usr/bin/clang >> $GITHUB_ENV
+          echo CXX=/usr/bin/clang++ >> $GITHUB_ENV
           echo ARCHFLAG="-arch ${{ matrix.arch }}" >> $GITHUB_ENV
 
       - name: Build 3rd-party libs
