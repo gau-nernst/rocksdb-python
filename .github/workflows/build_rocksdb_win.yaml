@@ -22,6 +22,7 @@ jobs:
 
       - name: Build Snappy
         run: |
+          echo ${{ github.workspace }}
           git clone https://github.com/google/snappy/
           mkdir snappy/build
           cd snappy/build
