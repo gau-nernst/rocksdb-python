@@ -39,7 +39,7 @@ jobs:
           mkdir zlib/build
           cd zlib/build
           cmake ${{ env.CMAKE_FLAGS }} -DAMD64=0 ..
-          msbuild LZ4.sln ${{ env.MSBUILD_FLAGS }}
+          msbuild zlib.sln ${{ env.MSBUILD_FLAGS }}
           cp Release/*.lib ../..
 
       - name: Build Zstd
