@@ -10,7 +10,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [x86_64, arm64]
+        # arch: [x86_64, arm64]
+        arch: [x86_64]
         
     steps:
       - name: Checkout
@@ -43,36 +44,37 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: rocksdb_${{ runner.os }}_${{ matrix.arch }}
-          path: "*.a"
-
-  create_universal:
-    needs: build
-    runs-on: macos-latest
-    steps:
-      - name: Download x86_64 build
-        uses: actions/download-artifact@v3
-        with:
-          name: rocksdb_${{ runner.os }}_x86_64
-          path: x86_64
-
-      - name: Download arm64 build
-        uses: actions/download-artifact@v3
-        with:
-          name: rocksdb_${{ runner.os }}_arm64
-          path: arm64
-
-      - name: Create universal build
-        run: |
-          for lib in $(ls x86_64/*.a)
-          do
-            filename=${lib##*/}
-            echo "Creating universal lib for $filename"
-            lipo -create -output $filename x86_64/$filename arm64/$filename
-          done
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        with:
           name: rocksdb_${{ runner.os }}
+          # name: rocksdb_${{ runner.os }}_${{ matrix.arch }}
           path: "*.a"
+
+  # create_universal:
+  #   needs: build
+  #   runs-on: macos-latest
+  #   steps:
+  #     - name: Download x86_64 build
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: rocksdb_${{ runner.os }}_x86_64
+  #         path: x86_64
+
+  #     - name: Download arm64 build
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: rocksdb_${{ runner.os }}_arm64
+  #         path: arm64
+
+  #     - name: Create universal build
+  #       run: |
+  #         for lib in $(ls x86_64/*.a)
+  #         do
+  #           filename=${lib##*/}
+  #           echo "Creating universal lib for $filename"
+  #           lipo -create -output $filename x86_64/$filename arm64/$filename
+  #         done
+
+  #     - name: Upload artifacts
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: rocksdb_${{ runner.os }}
+  #         path: "*.a"
