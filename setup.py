@@ -9,12 +9,14 @@ __version__ = "0.0.1"
 
 
 def get_libraries():
-    libraries = ["rocksdb"]
+    libraries = ["rocksdb", "lz4", "snappy", "zstd"]
     if IS_WIN:
         # for port_win.cc
-        libraries.extend(["Rpcrt4", "Shlwapi"])
+        libraries.extend(["Rpcrt4", "Shlwapi", "zlib"])
     else:
-        libraries.extend(["bz2", "lz4", "snappy", "z", "zstd"])
+        # bz2 not available on Windows
+        # zlib is z on Unix
+        libraries.extend(["bz2", "z"])
     return libraries
 
 
