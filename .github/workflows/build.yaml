@@ -36,6 +36,7 @@ jobs:
         run: |
           echo "CC=/usr/bin/clang" >> $GITHUB_ENV
           echo "CXX=/usr/bin/clang++" >> $GITHUB_ENV
+          echo MACOSX_DEPLOYMENT_TARGET=10.9 >> $GITHUB_ENV
 
       - name: Build
         run: python setup.py build_ext -i

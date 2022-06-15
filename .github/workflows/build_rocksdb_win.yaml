@@ -10,7 +10,7 @@ env:
 
 jobs:
   build_3rd_party:
-    runs-on: windows-latest        
+    runs-on: windows-latest
     steps:
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.1
@@ -49,7 +49,7 @@ jobs:
           cmake ${{ env.CMAKE_FLAGS }} -DZSTD_LEGACY_SUPPORT=0 -DZSTD_BUILD_PROGRAMS=0 -DZSTD_BUILD_TESTS=0 ./cmake
           msbuild zstd.sln ${{ env.MSBUILD_FLAGS }}
           cp lib/Release/*.lib ../..
-          
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -57,24 +57,23 @@ jobs:
           path: "*.lib"
 
   build_rocksdb:
-    runs-on: windows-latest        
+    runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          repository: facebook/rocksdb
+          submodules: true
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.1
 
       - name: Build rocksdb
         run: |
-          mkdir build
-          cd build
+          mkdir rocksdb/build
+          cd rocksdb/build
           cmake ${{ env.CMAKE_FLAGS }} -DPORTABLE=1 -DROCKSDB_BUILD_SHARED=0 -DWITH_BENCHMARK_TOOLS=0 -DWITH_CORE_TOOLS=0 -DWITH_TOOLS=0 ..
           msbuild rocksdb.sln ${{ env.MSBUILD_FLAGS }}
-          cp Release/*.lib ..
-          ls *.lib
+          cp Release/*.lib ../..
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
