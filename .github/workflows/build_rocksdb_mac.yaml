@@ -11,18 +11,17 @@ jobs:
       fail-fast: false
       matrix:
         arch: [x86_64, arm64]
-        
+
+    env:
+      CC: clang
+      CCX: clang++
+      ARCHFLAG: -arch ${{ matrix.arch }}
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           repository: facebook/rocksdb
-
-      - name: Set env variables
-        run: |
-          echo CC=/usr/bin/clang >> $GITHUB_ENV
-          echo CXX=/usr/bin/clang++ >> $GITHUB_ENV
-          echo ARCHFLAG="-arch ${{ matrix.arch }}" >> $GITHUB_ENV
 
       - name: Build 3rd-party libs
         run: |
