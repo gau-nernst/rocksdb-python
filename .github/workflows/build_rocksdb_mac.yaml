@@ -23,6 +23,7 @@ jobs:
           echo CC=clang >> $GITHUB_ENV
           echo CXX=clang++ >> $GITHUB_ENV
           echo ARCHFLAG="-arch ${{ matrix.arch }}" >> $GITHUB_ENV
+          echo MACOSX_DEPLOYMENT_TARGET=10.9 >> $GITHUB_ENV
 
       - name: Build 3rd-party libs
         run: |
