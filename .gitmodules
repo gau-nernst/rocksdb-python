@@ -1,4 +1,4 @@
 [submodule "rocksdb"]
 	path = rocksdb
 	url = https://github.com/facebook/rocksdb.git
-	branch = main
+	tag = v7.3.1
