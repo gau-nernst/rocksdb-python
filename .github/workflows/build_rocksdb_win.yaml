@@ -75,7 +75,7 @@ jobs:
           LZ4_LIB_RELEASE: ${{ github.workspace }}/lz4.lib
 
           ZLIB_HOME: ${{ github.workspace }}/zlib
-          ZLIB_INCLUDE: ${{ github.workspace }}/zlib
+          ZLIB_INCLUDE: ${{ github.workspace }}/zlib;${{ github.workspace }}/zlib/build
           ZLIB_LIB_RELEASE: ${{ github.workspace }}/zlib.lib
 
           ZSTD_HOME: ${{ github.workspace }}/zstd
