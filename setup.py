@@ -12,7 +12,8 @@ def get_libraries():
     libraries = ["rocksdb", "lz4", "snappy", "zstd"]
     if IS_WIN:
         # for port_win.cc
-        libraries.extend(["Rpcrt4", "Shlwapi", "zlib"])
+        # Cabinet is for XPRESS
+        libraries.extend(["Rpcrt4", "Shlwapi", "zlib", "Cabinet"])
     else:
         # bz2 not available on Windows
         # zlib is z on Unix
