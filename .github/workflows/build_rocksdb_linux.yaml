@@ -29,7 +29,7 @@ jobs:
           PORTABLE: 1
           CFLAGS: -fPIC
           CXXFLAGS: -fPIC
-          EXTRA_CXXFLAGS: -I./bzip2-1.0.8 -I./lz4-1.9.3/lib -I./snappy-1.1.8 -I./snappy-1.1.8/build -I./zlib-1.2.12 -I./zstd-1.4.9/lib
+          EXTRA_CXXFLAGS: -I./bzip2-1.0.8 -I./lz4-1.9.3/lib -I./snappy-1.1.8 -I./snappy-1.1.8/build -I./zlib-1.2.12 -I./zstd-1.4.9/lib -I./zstd-1.4.9/lib/dictBuilder
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
