@@ -29,7 +29,7 @@ jobs:
           make rocksdbjavastatic_deps -j3
           ls -lh *.a
         env:
-          cc: CC  # zlib bug: https://github.com/madler/zlib/issues/615
+          cc: $CC  # zlib bug: https://github.com/madler/zlib/issues/615
 
       - name: Build rocksdb
         run: |
