@@ -64,21 +64,23 @@ jobs:
           msbuild rocksdb.sln ${{ env.MSBUILD_FLAGS }}
           cp Release/*.lib ../..
         env:
-          SNAPPY_HOME: ../snappy
-          SNAPPY_INCLUDE: ../snappy;../snappy/build
-          SNAPPY_LIB_RELEASE: ../snappy.lib
+          THIRD_PARTY_HOME: ${{ github.workspace }}
 
-          LZ4_HOME: ../lz4
-          LZ4_INCLUDE: ../lz4/lib
-          LZ4_LIB_RELEASE: ../lz4.lib
+          SNAPPY_HOME: ${{ github.workspace }}/snappy
+          SNAPPY_INCLUDE: ${{ github.workspace }}/snappy;${{ github.workspace }}/snappy/build
+          SNAPPY_LIB_RELEASE: ${{ github.workspace }}/snappy.lib
 
-          ZLIB_HOME: ../zlib
-          ZLIB_INCLUDE: ../zlib
-          ZLIB_LIB_RELEASE: ../zlib.lib
+          LZ4_HOME: ${{ github.workspace }}/lz4
+          LZ4_INCLUDE: ${{ github.workspace }}/lz4/lib
+          LZ4_LIB_RELEASE: ${{ github.workspace }}/lz4.lib
 
-          ZSTD_HOME: ../zstd
-          ZSTD_INCLUDE: ../zstd/lib;../zstd/lib/dictBuilder
-          ZSTD_LIB_RELEASE: ../zstd.lib
+          ZLIB_HOME: ${{ github.workspace }}/zlib
+          ZLIB_INCLUDE: ${{ github.workspace }}/zlib
+          ZLIB_LIB_RELEASE: ${{ github.workspace }}/zlib.lib
+
+          ZSTD_HOME: ${{ github.workspace }}/zstd
+          ZSTD_INCLUDE: ${{ github.workspace }}/zstd/lib;${{ github.workspace }}/zstd/lib/dictBuilder
+          ZSTD_LIB_RELEASE: ${{ github.workspace }}/zstd.lib
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
