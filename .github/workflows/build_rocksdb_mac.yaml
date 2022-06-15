@@ -13,8 +13,8 @@ jobs:
         arch: [x86_64, arm64]
 
     env:
-      CC: clang
-      CCX: clang++
+      CC: /usr/bin/clang
+      CCX: /usr/bin/clang++
       ARCHFLAG: -arch ${{ matrix.arch }}
     
     steps:
@@ -25,7 +25,6 @@ jobs:
 
       - name: Build 3rd-party libs
         run: |
-          echo $ARCHFLAG
           make rocksdbjavastatic_deps -j3
           ls -lh *.a
         env:
