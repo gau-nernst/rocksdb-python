@@ -12,18 +12,17 @@ jobs:
       matrix:
         arch: [x86_64, arm64]
 
+    env:
+      CC: clang
+      CXX: clang++
+      ARCHFLAG: -arch ${{ matrix.arch }}
+      MACOSX_DEPLOYMENT_TARGET: 10.13
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           submodules: true
-
-      - name: Set env variables
-        run: |
-          echo CC=clang >> $GITHUB_ENV
-          echo CXX=clang++ >> $GITHUB_ENV
-          echo ARCHFLAG="-arch ${{ matrix.arch }}" >> $GITHUB_ENV
-          echo MACOSX_DEPLOYMENT_TARGET=10.9 >> $GITHUB_ENV
 
       - name: Build 3rd-party libs
         run: |

@@ -31,12 +31,13 @@ jobs:
       - name: Install dependencies
         run: pip install pybind11 pytest
 
-      - name: Use clang on macOS
+      - name: Set env vars on macOS
         if: runner.os == 'macOS'
         run: |
-          echo "CC=/usr/bin/clang" >> $GITHUB_ENV
-          echo "CXX=/usr/bin/clang++" >> $GITHUB_ENV
-          echo MACOSX_DEPLOYMENT_TARGET=10.9 >> $GITHUB_ENV
+          echo CC=clang >> $GITHUB_ENV
+          echo CXX=clang++ >> $GITHUB_ENV
+          echo MACOSX_DEPLOYMENT_TARGET=10.13 >> $GITHUB_ENV
+          echo "ARCHFLAGS=-arch x86_64 -arch arm64" >> $GITHUB_ENV
 
       - name: Build
         run: python setup.py build_ext -i
