@@ -59,7 +59,7 @@ jobs:
         run: |
           mkdir rocksdb/build
           cd rocksdb/build
-          cmake ${{ env.CMAKE_FLAGS }} -DWITH_SNAPPY=1 -DWITH_LZ4=1 -DWITH_ZLIB=1 -DWITH_ZSTD=1 -DXPRESS=1 \
+          cmake ${{ env.CMAKE_FLAGS }} -DWITH_SNAPPY=1 -DWITH_LZ4=1 -DWITH_ZLIB=1 -DWITH_ZSTD=1 -DXPRESS=1 `
             -DPORTABLE=1 -DROCKSDB_BUILD_SHARED=0 -DWITH_BENCHMARK_TOOLS=0 -DWITH_CORE_TOOLS=0 -DWITH_TOOLS=0 ..
           msbuild rocksdb.sln ${{ env.MSBUILD_FLAGS }}
           cp Release/*.lib ../..
