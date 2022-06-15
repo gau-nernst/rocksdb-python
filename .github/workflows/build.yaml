@@ -1,5 +1,8 @@
 name: Build
-on: push
+on:
+  push:
+    paths-ignore:
+      - .github/workflows/build_rocksdb_*.yaml  # no point building Python bindings when new rocksdb lib is not built yet
 
 jobs:
   build:
