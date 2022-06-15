@@ -15,6 +15,7 @@ def main():
     art_id = None
     for art in resp["artifacts"]:
         if art["name"] == args.name:
+            print(art)
             art_id = art["id"]
             break
     assert art_id is not None, f"Artifact {args.name} not found"

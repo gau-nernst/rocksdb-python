@@ -8,6 +8,7 @@ jobs:
   build:
     runs-on: macos-latest
     strategy:
+      fail-fast: false
       matrix:
         arch: [x86_64, arm64]
         
@@ -17,6 +18,20 @@ jobs:
         with:
           repository: facebook/rocksdb
 
+      - name: Set env variables
+        run: |
+          echo CC=/usr/bin/clang >> $GITHUB_ENV
+          echo CXX=/usr/bin/clang++ >> $GITHUB_ENV
+          echo ARCHFLAG="-arch ${{ matrix.arch }}" >> $GITHUB_ENV
+
+      - name: Build 3rd-party libs
+        run: |
+          echo $ARCHFLAG
+          make rocksdbjavastatic_deps -j3
+          ls -lh *.a
+        env:
+          cc: CC  # zlib bug: https://github.com/madler/zlib/issues/615
+
       - name: Build rocksdb
         run: |
           make static_lib -j3
@@ -24,13 +39,12 @@ jobs:
           cat make_config.mk
         env:
           PORTABLE: 1
-          ARCHFLAG: -arch ${{ matrix.arch }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: rocksdb_${{ runner.os }}_${{ matrix.arch }}
-          path: librocksdb.a
+          path: "*.a"
 
   create_universal:
     needs: build
@@ -49,10 +63,16 @@ jobs:
           path: arm64
 
       - name: Create universal build
-        run: lipo -create -output librocksdb.a x86_64/librocksdb.a arm64/librocksdb.a
+        run: |
+          for lib in $(ls x86_64/*.a)
+          do
+            filename=${lib##*/}
+            echo "Creating universal lib for $filename"
+            lipo -create -output $filename x86_64/$filename arm64/$filename
+          done
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: rocksdb_${{ runner.os }}
-          path: librocksdb.a
+          path: "*.a"

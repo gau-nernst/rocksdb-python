@@ -13,6 +13,11 @@ jobs:
         with:
           repository: facebook/rocksdb
 
+      - name: Build 3rd-party libs
+        run: |
+          make rocksdbjavastatic_deps -j2
+          ls -lh *.a
+
       - name: Build rocksdb
         run: |
           make static_lib -j2
@@ -27,4 +32,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: rocksdb_${{ runner.os }}
-          path: librocksdb.a
+          path: "*.a"
