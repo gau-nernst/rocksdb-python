@@ -9,7 +9,7 @@ env:
   MSBUILD_FLAGS: /m:2 /p:Configuration=Release /p:Platform=x64
 
 jobs:
-  build:
+  build_3rd_party:
     runs-on: windows-latest        
     steps:
       - name: Add msbuild to PATH
@@ -18,9 +18,8 @@ jobs:
       - name: Build Snappy
         run: |
           git clone https://github.com/google/snappy/
-          cd snappy
-          mkdir build
-          cd build
+          mkdir snappy/build
+          cd snappy/build
           cmake ${{ env.CMAKE_FLAGS }} -DSNAPPY_BUILD_TESTS=OFF -DSNAPPY_BUILD_BENCHMARKS=OFF ..
           msbuild Snappy.sln ${{ env.MSBUILD_FLAGS }}
           cp Release/*.lib ../..
@@ -29,14 +28,26 @@ jobs:
         run: |
           git clone https://github.com/lz4/lz4
           cd lz4/build
-          cmake -G "Visual Studio 17 2022" -A x64 -DLZ4_BUILD_CLI=0 -DLZ4_BUILD_LEGACY_LZ4C=0 -DLZ4_BUNDLED_MODE=1 ./cmake
-          msbuild LZ4.sln /p:Configuration=Release /p:Platform=x64
+          cmake ${{ env.CMAKE_FLAGS }} -DLZ4_BUILD_CLI=0 -DLZ4_BUILD_LEGACY_LZ4C=0 -DLZ4_BUNDLED_MODE=1 ./cmake
+          msbuild LZ4.sln ${{ env.MSBUILD_FLAGS }}
           cp Release/*.lib ../..
 
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: rocksdb_${{ runner.os }}
+          path: "*.lib"
+
+  build_rocksdb:
+    runs-on: windows-latest        
+    steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           repository: facebook/rocksdb
+
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.1
 
       - name: Build rocksdb
         run: |
