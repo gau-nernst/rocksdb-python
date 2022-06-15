@@ -48,7 +48,7 @@ jobs:
           cd zstd/build
           cmake ${{ env.CMAKE_FLAGS }} -DZSTD_LEGACY_SUPPORT=0 -DZSTD_BUILD_PROGRAMS=0 -DZSTD_BUILD_TESTS=0 ./cmake
           msbuild zstd.sln ${{ env.MSBUILD_FLAGS }}
-          cp Release/*.lib ../..
+          cp Release/lib/*.lib ../..
           
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
