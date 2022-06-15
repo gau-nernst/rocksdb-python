@@ -22,7 +22,6 @@ jobs:
 
       - name: Build Snappy
         run: |
-          echo ${{ github.workspace }}
           git clone https://github.com/google/snappy/
           mkdir snappy/build
           cd snappy/build
@@ -65,21 +64,21 @@ jobs:
           msbuild rocksdb.sln ${{ env.MSBUILD_FLAGS }}
           cp Release/*.lib ../..
         env:
-          SNAPPY_HOME: ./snappy
-          SNAPPY_INCLUDE: ./snappy;./snappy/build
-          SNAPPY_LIB_RELEASE: ./snappy.lib
+          SNAPPY_HOME: ../snappy
+          SNAPPY_INCLUDE: ../snappy;../snappy/build
+          SNAPPY_LIB_RELEASE: ../snappy.lib
 
-          LZ4_HOME: ./lz4
-          LZ4_INCLUDE: ./lz4/lib
-          LZ4_LIB_RELEASE: ./lz4.lib
+          LZ4_HOME: ../lz4
+          LZ4_INCLUDE: ../lz4/lib
+          LZ4_LIB_RELEASE: ../lz4.lib
 
-          ZLIB_HOME: ./zlib
-          ZLIB_INCLUDE: ./zlib
-          ZLIB_LIB_RELEASE: ./zlib.lib
+          ZLIB_HOME: ../zlib
+          ZLIB_INCLUDE: ../zlib
+          ZLIB_LIB_RELEASE: ../zlib.lib
 
-          ZSTD_HOME: ./zstd
-          ZSTD_INCLUDE: ./zstd/lib;./zstd/lib/dictBuilder
-          ZSTD_LIB_RELEASE: ./zstd.lib
+          ZSTD_HOME: ../zstd
+          ZSTD_INCLUDE: ../zstd/lib;../zstd/lib/dictBuilder
+          ZSTD_LIB_RELEASE: ../zstd.lib
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
