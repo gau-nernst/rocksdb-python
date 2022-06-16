@@ -34,9 +34,11 @@ Place the built binaries in the root directory of this repo. e.g. `librocksdb.a`
 
 Build Python bindings (this repo)
 
-```
+```bash
 pip install pybind11
 python setup.py build_ext -i
+# on macOS, add MACOSX_DEPLOYMENT_TARGET=10.13, follows RocksDB
+# MACOSX_DEPLOYMENT_TARGET=10.13 python setup.py build_ext -i
 ```
 
 # Basic usage
