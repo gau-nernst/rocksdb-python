@@ -40,7 +40,7 @@ jobs:
         run: |
           git clone https://github.com/lz4/lz4
           cd lz4
-          git checkout ${{ env.LZ4_VER }}
+          git checkout v${{ env.LZ4_VER }}
           cd build
           cmake ${{ env.CMAKE_FLAGS }} -DLZ4_BUILD_CLI=0 -DLZ4_BUILD_LEGACY_LZ4C=0 -DLZ4_BUNDLED_MODE=1 ./cmake
           msbuild LZ4.sln ${{ env.MSBUILD_FLAGS }}
@@ -51,7 +51,7 @@ jobs:
         run: |
           git clone https://github.com/madler/zlib
           cd zlib
-          git checkout ${{ env.ZLIB_VER }}
+          git checkout v${{ env.ZLIB_VER }}
           mkdir build
           cd build
           cmake ${{ env.CMAKE_FLAGS }} -DAMD64=0 ..
@@ -62,7 +62,7 @@ jobs:
         run: |
           git clone https://github.com/facebook/zstd
           cd zstd
-          git checkout ${{ env.ZSTD_VER }}
+          git checkout v${{ env.ZSTD_VER }}
           cd build
           cmake ${{ env.CMAKE_FLAGS }} -DZSTD_LEGACY_SUPPORT=0 -DZSTD_BUILD_PROGRAMS=0 -DZSTD_BUILD_TESTS=0 ./cmake
           msbuild zstd.sln ${{ env.MSBUILD_FLAGS }}
