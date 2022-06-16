@@ -32,7 +32,7 @@ jobs:
           git checkout ${{ env.SNAPPY_VER }}
           mkdir build
           cd build
-          cmake ${{ env.CMAKE_FLAGS }} -DSNAPPY_BUILD_TESTS=OFF -DSNAPPY_BUILD_BENCHMARKS=OFF ..
+          cmake ${{ env.CMAKE_FLAGS }} -DSNAPPY_BUILD_TESTS=0 ..
           msbuild Snappy.sln ${{ env.MSBUILD_FLAGS }}
           cp Release/*.lib ../..
 
@@ -89,11 +89,11 @@ jobs:
 
           ZLIB_HOME: ${{ github.workspace }}/zlib
           ZLIB_INCLUDE: ${{ github.workspace }}/zlib;${{ github.workspace }}/zlib/build
-          ZLIB_LIB_RELEASE: ${{ github.workspace }}/zlib.lib
+          ZLIB_LIB_RELEASE: ${{ github.workspace }}/zlibstatic.lib
 
           ZSTD_HOME: ${{ github.workspace }}/zstd
           ZSTD_INCLUDE: ${{ github.workspace }}/zstd/lib;${{ github.workspace }}/zstd/lib/dictBuilder
-          ZSTD_LIB_RELEASE: ${{ github.workspace }}/zstd.lib
+          ZSTD_LIB_RELEASE: ${{ github.workspace }}/zstd_static.lib
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
