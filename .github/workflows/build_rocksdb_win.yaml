@@ -4,28 +4,97 @@ on:
     paths:
      - .github/workflows/build_rocksdb_win.yaml
 
+env:
+  CMAKE_FLAGS: -G "Visual Studio 17 2022" -A x64 -DCMAKE_GENERATOR_PLATFORM=x64 -DCMAKE_BUILD_TYPE=Release
+  MSBUILD_FLAGS: /m:2 /p:Configuration=Release /p:Platform=x64
+
+  SNAPPY_VER: "1.1.8"
+  LZ4_VER: "1.9.3"
+  ZLIB_VER: "1.2.12"
+  ZSTD_VER: "1.4.9"
+
 jobs:
   build:
-    runs-on: windows-latest        
+    runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          repository: facebook/rocksdb
+          submodules: true
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.1
 
-      - name: Build rocksdb
+      - name: Build Snappy
         run: |
+          git clone https://github.com/google/snappy/
+          cd snappy
+          git checkout ${{ env.SNAPPY_VER }}
           mkdir build
           cd build
-          cmake -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=Release -DPORTABLE=1 -DROCKSDB_BUILD_SHARED=0 -DWITH_BENCHMARK_TOOLS=0 -DWITH_CORE_TOOLS=0 -DWITH_TOOLS=0 ..
-          msbuild rocksdb.sln /m:2 /p:Configuration=Release
-          ls Release
+          cmake ${{ env.CMAKE_FLAGS }} -DSNAPPY_BUILD_TESTS=0 ..
+          msbuild Snappy.sln ${{ env.MSBUILD_FLAGS }}
+          cp Release/*.lib ../..
+
+      - name: Build LZ4
+        run: |
+          git clone https://github.com/lz4/lz4
+          cd lz4
+          git checkout v${{ env.LZ4_VER }}
+          cd build
+          cmake ${{ env.CMAKE_FLAGS }} -DLZ4_BUILD_CLI=0 -DLZ4_BUILD_LEGACY_LZ4C=0 -DLZ4_BUNDLED_MODE=1 ./cmake
+          msbuild LZ4.sln ${{ env.MSBUILD_FLAGS }}
+          cp Release/*.lib ../..
+
+      # there are problems with assembly code: https://github.com/madler/zlib/issues/631
+      - name: Build ZLib
+        run: |
+          git clone https://github.com/madler/zlib
+          cd zlib
+          git checkout v${{ env.ZLIB_VER }}
+          mkdir build
+          cd build
+          cmake ${{ env.CMAKE_FLAGS }} -DAMD64=0 ..
+          msbuild zlib.sln ${{ env.MSBUILD_FLAGS }}
+          cp Release/*.lib ../..
+
+      - name: Build Zstd
+        run: |
+          git clone https://github.com/facebook/zstd
+          cd zstd
+          git checkout v${{ env.ZSTD_VER }}
+          cd build
+          cmake ${{ env.CMAKE_FLAGS }} -DZSTD_LEGACY_SUPPORT=0 -DZSTD_BUILD_PROGRAMS=0 -DZSTD_BUILD_TESTS=0 ./cmake
+          msbuild zstd.sln ${{ env.MSBUILD_FLAGS }}
+          cp lib/Release/*.lib ../..
+
+      - name: Build rocksdb
+        run: |
+          mkdir rocksdb/build
+          cd rocksdb/build
+          cmake ${{ env.CMAKE_FLAGS }} -DWITH_SNAPPY=1 -DWITH_LZ4=1 -DWITH_ZLIB=1 -DWITH_ZSTD=1 -DXPRESS=1 `
+            -DPORTABLE=1 -DROCKSDB_BUILD_SHARED=0 -DWITH_BENCHMARK_TOOLS=0 -DWITH_CORE_TOOLS=0 -DWITH_TOOLS=0 ..
+          msbuild rocksdb.sln ${{ env.MSBUILD_FLAGS }}
+          cp Release/*.lib ../..
+        env:
+          SNAPPY_HOME: ../snappy
+          SNAPPY_INCLUDE: ../snappy;../snappy/build
+          SNAPPY_LIB_RELEASE: ../snappy.lib
+
+          LZ4_HOME: ../lz4
+          LZ4_INCLUDE: ../lz4/lib
+          LZ4_LIB_RELEASE: ../lz4.lib
+
+          ZLIB_HOME: ../zlib
+          ZLIB_INCLUDE: ../zlib;../zlib/build
+          ZLIB_LIB_RELEASE: ../zlibstatic.lib
+
+          ZSTD_HOME: ../zstd
+          ZSTD_INCLUDE: ../zstd/lib;../zstd/lib/dictBuilder
+          ZSTD_LIB_RELEASE: ../zstd_static.lib
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: rocksdb_${{ runner.os }}
-          path: build/Release/rocksdb.lib
+          path: "*.lib"

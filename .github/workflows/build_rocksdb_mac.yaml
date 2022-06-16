@@ -11,40 +11,42 @@ jobs:
       fail-fast: false
       matrix:
         arch: [x86_64, arm64]
-        
+
+    env:
+      CC: clang
+      CXX: clang++
+      ARCHFLAG: -arch ${{ matrix.arch }}
+      MACOSX_DEPLOYMENT_TARGET: 10.13
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          repository: facebook/rocksdb
-
-      - name: Set env variables
-        run: |
-          echo CC=/usr/bin/clang >> $GITHUB_ENV
-          echo CXX=/usr/bin/clang++ >> $GITHUB_ENV
-          echo ARCHFLAG="-arch ${{ matrix.arch }}" >> $GITHUB_ENV
+          submodules: true
 
       - name: Build 3rd-party libs
         run: |
-          echo $ARCHFLAG
+          cd rocksdb
           make rocksdbjavastatic_deps -j3
           ls -lh *.a
         env:
-          cc: CC  # zlib bug: https://github.com/madler/zlib/issues/615
+          cc: clang  # zlib bug: https://github.com/madler/zlib/issues/615
 
       - name: Build rocksdb
         run: |
+          cd rocksdb
           make static_lib -j3
           strip librocksdb.a
           cat make_config.mk
         env:
           PORTABLE: 1
+          EXTRA_CXXFLAGS: -I./bzip2-1.0.8 -I./lz4-1.9.3/lib -I./snappy-1.1.8 -I./snappy-1.1.8/build -I./zlib-1.2.12 -I./zstd-1.4.9/lib -I./zstd-1.4.9/lib/dictBuilder
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: rocksdb_${{ runner.os }}_${{ matrix.arch }}
-          path: "*.a"
+          path: "rocksdb/*.a"
 
   create_universal:
     needs: build
