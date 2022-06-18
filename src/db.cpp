@@ -3,6 +3,7 @@ namespace py = pybind11;
 
 #include "rocksdb/db.h"
 #include "rocksdb/options.h"
+#include "py_wrapper.h"
 
 using ROCKSDB_NAMESPACE::DB;
 using ROCKSDB_NAMESPACE::Options;
@@ -36,6 +37,12 @@ public:
             throw std::runtime_error(s.ToString());
         return value;
     }
+    void Write(const WriteOptions &options, PyWriteBatch &batch)
+    {
+        Status s = db->Write(options, batch.batch);
+        if (!s.ok())
+            throw std::runtime_error(s.ToString());
+    }
 
 private:
     DB *db;
@@ -46,5 +53,6 @@ void init_db(py::module_ &m)
     py::class_<PyDB>(m, "PyDB")
         .def(py::init<const Options &, const std::string &>())
         .def("Put", &PyDB::Put)
-        .def("Get", &PyDB::Get);
+        .def("Get", &PyDB::Get)
+        .def("Write", &PyDB::Write);
 }
