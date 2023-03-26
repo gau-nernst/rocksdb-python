@@ -18,9 +18,17 @@ TBD
 
 ## From source
 
+Install RocksDB (https://github.com/facebook/rocksdb/blob/main/INSTALL.md)
+
+On MacOS, with Homebrew
+
+```bash
+brew install rocksdb
+```
+
 Build RocksDB
 
-You need to build RocksDB (and optionally 3rd-party compression libraries) from source. Refer to the [official instructions](https://github.com/facebook/rocksdb/blob/main/INSTALL.md) for more information. Additionally, you can also refer to [Building on Windows](https://github.com/facebook/rocksdb/wiki/Building-on-Windows) if you are building on Windows.
+You need to build RocksDB (and optionally 3rd-party compression libraries) from source.  for more information. Additionally, you can also refer to [Building on Windows](https://github.com/facebook/rocksdb/wiki/Building-on-Windows) if you are building on Windows.
 
 ```bash
 # on Linux and macOS
@@ -43,17 +51,10 @@ Place the built binaries in the root directory of this repo. e.g. `librocksdb.a`
 Build Python bindings (this repo)
 
 ```bash
-# if you haven't cloned
 git clone --recursive https://github.com/gau-nernst/rocksdb-python
 cd rocksdb-python
-
-pip install pybind11
-python setup.py build_ext -i
-# on macOS, add MACOSX_DEPLOYMENT_TARGET=10.13, follows RocksDB
-# MACOSX_DEPLOYMENT_TARGET=10.13 python setup.py build_ext -i
+pip install .
 ```
-
-The `rocksdb` submodule should be in the same commit as the commit used to build RocksDB in the previous step (or even better, same release version). This is to make sure RocksDB's header files are consistent with the RocksDB binary.
 
 # Basic usage
 
