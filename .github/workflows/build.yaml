@@ -57,18 +57,25 @@ jobs:
 
       - name: Install RocksDB dependencies
         run: sudo apt-get -y install libsnappy-dev zlib1g-dev libbz2-dev liblz4-dev libzstd-dev
-      
+
       - name: Checkout RocksDB
-        repository: facebook/rocksdb
-        ref: v8.0.0
-        path: rocksdb
+        uses: actions/checkout@v3
+        with:
+          repository: facebook/rocksdb
+          ref: v8.0.0
+          path: rocksdb
 
       - name: Build RocksDB
         run: |
           cd rocksdb
+          make static_lib -j $(nproc)
+          strip --strip-debug librocksdb.a
           mkdir build
-          cd build
-          make -C .. static_lib -j
+          cp librocksdb.a build/
+        env:
+          PORTABLE: 1
+          CFLAGS: -fPIC
+          CXXFLAGS: -fPIC
 
       - name: Setup Python
         uses: actions/setup-python@v3

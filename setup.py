@@ -14,7 +14,7 @@ library_dirs = []
 
 CURRENT_DIR = Path(__file__).parent
 
-if platform.system() == "Unix":
+if platform.system() == "Linux":
     LOCAL_ROCKSDB_PATH = CURRENT_DIR / "rocksdb"
     if LOCAL_ROCKSDB_PATH.exists():
         include_dirs.append(str(LOCAL_ROCKSDB_PATH / "include"))
