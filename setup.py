@@ -1,6 +1,7 @@
 import platform
 import subprocess
 from glob import glob
+from pathlib import Path
 
 from pybind11.setup_helpers import Pybind11Extension
 from setuptools import setup
@@ -11,13 +12,20 @@ __version__ = "0.0.1"
 include_dirs = []
 library_dirs = []
 
+CURRENT_DIR = Path(__file__).parent
 
-if platform.system() == "Darwin":
+if platform.system() == "Unix":
+    LOCAL_ROCKSDB_PATH = CURRENT_DIR / "rocksdb"
+    if LOCAL_ROCKSDB_PATH.exists():
+        include_dirs.append(str(LOCAL_ROCKSDB_PATH / "include"))
+        library_dirs.append(str(LOCAL_ROCKSDB_PATH / "build"))
+
+elif platform.system() == "Darwin":
     try:
         proc = subprocess.run(["brew", "--prefix"], check=True, capture_output=True)
-        HOMEBREW_PATH = proc.stdout.decode().strip()
-        include_dirs.append(HOMEBREW_PATH + "/include")
-        library_dirs.append(HOMEBREW_PATH + "/lib")
+        HOMEBREW_PATH = Path(proc.stdout.decode().strip())
+        include_dirs.append(str(HOMEBREW_PATH / "include"))
+        library_dirs.append(str(HOMEBREW_PATH / "lib"))
     except subprocess.CalledProcessError:
         pass
 
