@@ -127,7 +127,9 @@ jobs:
         uses: microsoft/setup-msbuild@v1.1
 
       - name: Install RocksDB from vcpkg
-        run: vcpkg install rocksdb:x64-windows
+        run: |
+          vcpkg install rocksdb:x64-windows
+          vcpkg integrate install
 
       - name: Setup Python
         uses: actions/setup-python@v3
