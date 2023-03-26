@@ -24,13 +24,14 @@ if LOCAL_ROCKSDB_PATH.exists():
     include_dirs.append(str(LOCAL_ROCKSDB_PATH / "include"))
     library_dirs.append(str(LOCAL_ROCKSDB_PATH / "build"))
 
-try:
-    proc = subprocess.run(["brew", "--prefix"], check=True, capture_output=True)
-    HOMEBREW_PREFIX = proc.stdout.decode().strip()
-    include_dirs.append(HOMEBREW_PREFIX + "/include")
-    library_dirs.append(HOMEBREW_PREFIX + "/lib")
-except subprocess.CalledProcessError:
-    pass
+if platform.system() == "Darwin":
+    try:
+        proc = subprocess.run(["brew", "--prefix"], check=True, capture_output=True)
+        HOMEBREW_PREFIX = proc.stdout.decode().strip()
+        include_dirs.append(HOMEBREW_PREFIX + "/include")
+        library_dirs.append(HOMEBREW_PREFIX + "/lib")
+    except FileNotFoundError:
+        pass
 
 libraries = ["rocksdb"]
 if platform.system() == "Windows":
