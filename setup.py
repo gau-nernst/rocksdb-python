@@ -1,3 +1,4 @@
+import os
 import platform
 import subprocess
 from glob import glob
@@ -13,20 +14,23 @@ library_dirs = []
 
 CURRENT_DIR = Path(__file__).parent
 
-if platform.system() == "Linux":
-    LOCAL_ROCKSDB_PATH = CURRENT_DIR / "rocksdb"
-    if LOCAL_ROCKSDB_PATH.exists():
-        include_dirs.append(str(LOCAL_ROCKSDB_PATH / "include"))
-        library_dirs.append(str(LOCAL_ROCKSDB_PATH / "build"))
+CONDA_PREFIX = os.environ.get("CONDA_PREFIX", None)
+if CONDA_PREFIX is not None:
+    include_dirs.append(CONDA_PREFIX + "/include")
+    library_dirs.append(CONDA_PREFIX + "/lib")
 
-elif platform.system() == "Darwin":
-    try:
-        proc = subprocess.run(["brew", "--prefix"], check=True, capture_output=True)
-        HOMEBREW_PATH = Path(proc.stdout.decode().strip())
-        include_dirs.append(str(HOMEBREW_PATH / "include"))
-        library_dirs.append(str(HOMEBREW_PATH / "lib"))
-    except subprocess.CalledProcessError:
-        pass
+LOCAL_ROCKSDB_PATH = CURRENT_DIR / "rocksdb"
+if LOCAL_ROCKSDB_PATH.exists():
+    include_dirs.append(str(LOCAL_ROCKSDB_PATH / "include"))
+    library_dirs.append(str(LOCAL_ROCKSDB_PATH / "build"))
+
+try:
+    proc = subprocess.run(["brew", "--prefix"], check=True, capture_output=True)
+    HOMEBREW_PREFIX = proc.stdout.decode().strip()
+    include_dirs.append(HOMEBREW_PREFIX + "/include")
+    library_dirs.append(HOMEBREW_PREFIX + "/lib")
+except subprocess.CalledProcessError:
+    pass
 
 libraries = ["rocksdb"]
 if platform.system() == "Windows":
