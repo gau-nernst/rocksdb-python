@@ -24,7 +24,7 @@ jobs:
         run: conda install rocksdb pytest -c conda-forge
 
       - name: Build
-        run: pip install . -v
+        run: python -m pip install . -v
 
       - name: Test
         run: pytest tests/
