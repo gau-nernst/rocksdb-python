@@ -74,8 +74,8 @@ jobs:
           cp librocksdb.a build/
         env:
           PORTABLE: 1
-          CFLAGS: -fPIC
-          CXXFLAGS: -fPIC
+          EXTRA_CFLAGS: -fPIC
+          EXTRA_CXXFLAGS: -fPIC
 
       - name: Setup Python
         uses: actions/setup-python@v3
@@ -104,6 +104,30 @@ jobs:
           HOMEBREW_NO_AUTO_UPDATE: 1
           HOMEBREW_NO_INSTALL_CLEANUP: 1
           HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
+
+      - name: Setup Python
+        uses: actions/setup-python@v3
+
+      - name: Install dependencies
+        run: pip install pytest
+
+      - name: Build
+        run: pip install .
+
+      - name: Test
+        run: pytest tests/
+
+  build_windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Install RocksDB from vcpkg
+        run: vcpkg install rocksdb:x64-windows
 
       - name: Setup Python
         uses: actions/setup-python@v3

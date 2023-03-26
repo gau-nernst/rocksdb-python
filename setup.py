@@ -6,7 +6,6 @@ from pathlib import Path
 from pybind11.setup_helpers import Pybind11Extension
 from setuptools import setup
 
-IS_WIN = platform.system() == "Windows"
 __version__ = "0.0.1"
 
 include_dirs = []
@@ -29,6 +28,11 @@ elif platform.system() == "Darwin":
     except subprocess.CalledProcessError:
         pass
 
+libraries = ["rocksdb"]
+if platform.system() == "Windows":
+    libraries.append("Shlwapi")
+    libraries.append("Rpcrt4")
+
 # def get_libraries():
 #     libraries = ["rocksdb", "lz4", "snappy"]
 #     if IS_WIN:
@@ -43,7 +47,7 @@ ext = Pybind11Extension(
     "rocksdb_python",
     sorted(glob("src/*.cpp")),
     include_dirs=include_dirs,
-    libraries=["rocksdb"],
+    libraries=libraries,
     library_dirs=library_dirs,
     define_macros=[("VERSION_INFO", __version__)],
     cxx_std=17,
