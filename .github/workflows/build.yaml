@@ -102,6 +102,8 @@ jobs:
         run: brew install rocksdb
         env:
           HOMEBREW_NO_AUTO_UPDATE: 1
+          HOMEBREW_NO_INSTALL_CLEANUP: 1
+          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
 
       - name: Setup Python
         uses: actions/setup-python@v3
