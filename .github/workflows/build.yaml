@@ -87,7 +87,7 @@ jobs:
         run: pip install .
 
       - name: Test
-        run: pytest .
+        run: pytest tests/
 
   build_macos:
     runs-on: macos-latest
@@ -100,6 +100,8 @@ jobs:
 
       - name: Install RocksDB from Homebrew
         run: brew install rocksdb
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: 1
 
       - name: Setup Python
         uses: actions/setup-python@v3
@@ -111,4 +113,4 @@ jobs:
         run: pip install .
 
       - name: Test
-        run: pytest .
+        run: pytest tests/
