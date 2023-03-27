@@ -28,7 +28,7 @@ jobs:
           activate-environment: ""
 
       - name: Install dependencies
-        run: conda install -q -y rocksdb pytest -c conda-forge
+        run: conda install -q -y "rocksdb>=7" pytest -c conda-forge
 
       - name: Build
         run: python -m pip install . -v
