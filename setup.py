@@ -19,7 +19,7 @@ if CONDA_PREFIX is not None:
     library_dirs.append(CONDA_PREFIX + "/lib")
 
 LOCAL_ROCKSDB_PATH = CURRENT_DIR + "/rocksdb"
-if LOCAL_ROCKSDB_PATH.exists():
+if os.path.exists(LOCAL_ROCKSDB_PATH):
     include_dirs.append(LOCAL_ROCKSDB_PATH + "/include")
     library_dirs.append(LOCAL_ROCKSDB_PATH + "/build")
 
