@@ -33,7 +33,7 @@ if platform.system() == "Darwin":
     except FileNotFoundError:
         pass
 
-libraries = ["rocksdb"]
+libraries = ["rocksdb", "snappy", "z", "bz2", "lz4", "zstd"]
 if platform.system() == "Windows":
     libraries.append("Shlwapi")
     libraries.append("Rpcrt4")
