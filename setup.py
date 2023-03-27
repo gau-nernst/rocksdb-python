@@ -42,8 +42,11 @@ if platform.system() == "Windows":
         proc = subprocess.run(["where", "vcpkg"], check=True, capture_output=True)
         VCPKG_PREFIX = Path(proc.stdout.decode().strip()).parent
         print(VCPKG_PREFIX)
+        print(list(VCPKG_PREFIX.iterdir()))
         print(list((VCPKG_PREFIX / "triplets").iterdir()))
-        print(list((VCPKG_PREFIX / ".vcpkg-root").iterdir()))
+        # print(list((VCPKG_PREFIX / ".vcpkg-root").iterdir()))
+        print(list((VCPKG_PREFIX / "installed").iterdir()))
+        print(list((VCPKG_PREFIX / "installed" / "x64-windows").iterdir()))
     except Exception as e:
         print(e)
 
