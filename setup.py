@@ -2,6 +2,7 @@ import os
 import platform
 import subprocess
 from glob import glob
+from pathlib import Path
 
 from pybind11.setup_helpers import Pybind11Extension
 from setuptools import setup
@@ -11,36 +12,38 @@ __version__ = "0.0.1"
 include_dirs = []
 library_dirs = []
 
-CURRENT_DIR = os.path.dirname(__file__)
+
+def add_path(path, include="include", lib="lib"):
+    include_dirs.append(str(path / include))
+    library_dirs.append(str(path / lib))
+
+
+CURRENT_DIR = Path(__file__).parent
 
 CONDA_PREFIX = os.environ.get("CONDA_PREFIX", None)
 if CONDA_PREFIX is not None:
-    include_dirs.append(CONDA_PREFIX + "/include")
-    library_dirs.append(CONDA_PREFIX + "/lib")
+    CONDA_PREFIX = Path(CONDA_PREFIX)
+    add_path(CONDA_PREFIX)
 
-LOCAL_ROCKSDB_PATH = CURRENT_DIR + "/rocksdb"
+LOCAL_ROCKSDB_PATH = CURRENT_DIR / "rocksdb"
 if os.path.exists(LOCAL_ROCKSDB_PATH):
-    include_dirs.append(LOCAL_ROCKSDB_PATH + "/include")
-    library_dirs.append(LOCAL_ROCKSDB_PATH + "/build")
+    add_path(LOCAL_ROCKSDB_PATH, lib="")
 
 if platform.system() == "Darwin":
     try:
         proc = subprocess.run(["brew", "--prefix"], check=True, capture_output=True)
-        HOMEBREW_PREFIX = proc.stdout.decode().strip()
-        include_dirs.append(HOMEBREW_PREFIX + "/include")
-        library_dirs.append(HOMEBREW_PREFIX + "/lib")
+        HOMEBREW_PREFIX = Path(proc.stdout.decode().strip())
+        add_path(HOMEBREW_PREFIX)
     except FileNotFoundError:
         pass
 
 if platform.system() == "Windows":
     try:
         proc = subprocess.run(["where", "vcpkg"], check=True, capture_output=True)
-        VCPKG_PREFIX = os.path.dirname(proc.stdout.decode().strip())
+        VCPKG_PREFIX = Path(proc.stdout.decode().strip()).parent
         print(VCPKG_PREFIX)
-        print(os.listdir(VCPKG_PREFIX + "/triplets"))
-        print(os.listdir(VCPKG_PREFIX + "/.vcpkg-root"))
-        include_dirs.append(VCPKG_PREFIX + "/include")
-        library_dirs.append(VCPKG_PREFIX + "/lib")
+        print(list((VCPKG_PREFIX / "triplets").iterdir()))
+        print(list((VCPKG_PREFIX / ".vcpkg-root").iterdir()))
     except Exception as e:
         print(e)
 
