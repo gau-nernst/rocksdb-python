@@ -2,7 +2,6 @@ import os
 import platform
 import subprocess
 from glob import glob
-from pathlib import Path
 
 from pybind11.setup_helpers import Pybind11Extension
 from setuptools import setup
@@ -12,17 +11,17 @@ __version__ = "0.0.1"
 include_dirs = []
 library_dirs = []
 
-CURRENT_DIR = Path(__file__).parent
+CURRENT_DIR = os.path.dirname(__file__)
 
 CONDA_PREFIX = os.environ.get("CONDA_PREFIX", None)
 if CONDA_PREFIX is not None:
     include_dirs.append(CONDA_PREFIX + "/include")
     library_dirs.append(CONDA_PREFIX + "/lib")
 
-LOCAL_ROCKSDB_PATH = CURRENT_DIR / "rocksdb"
+LOCAL_ROCKSDB_PATH = CURRENT_DIR + "/rocksdb"
 if LOCAL_ROCKSDB_PATH.exists():
-    include_dirs.append(str(LOCAL_ROCKSDB_PATH / "include"))
-    library_dirs.append(str(LOCAL_ROCKSDB_PATH / "build"))
+    include_dirs.append(LOCAL_ROCKSDB_PATH + "/include")
+    library_dirs.append(LOCAL_ROCKSDB_PATH + "/build")
 
 if platform.system() == "Darwin":
     try:
@@ -36,8 +35,10 @@ if platform.system() == "Darwin":
 if platform.system() == "Windows":
     try:
         proc = subprocess.run(["where", "vcpkg"], check=True, capture_output=True)
-        VCPKG_PREFIX = proc.stdout.decode().strip()
-        print(VCPKG_PREFIX)
+        VCPKG_PREFIX = os.path.dirname(proc.stdout.decode().strip())
+        print(os.listdir(VCPKG_PREFIX))
+        include_dirs.append(VCPKG_PREFIX + "/include")
+        library_dirs.append(VCPKG_PREFIX + "/lib")
     except Exception as e:
         print(e)
 
