@@ -21,8 +21,7 @@ def add_path(path, include="include", lib="lib"):
 
 CURRENT_DIR = Path(__file__).parent
 
-IS_CONDA_AVAILABLE = subprocess.run(["conda", "info"]).returncode == 0
-CONDA_PREFIX = Path(os.environ["CONDA_PREFIX"]) if IS_CONDA_AVAILABLE else None
+CONDA_PREFIX = Path(os.environ["CONDA_PREFIX"]) if "CONDA_PREFIX" in os.environ else None
 
 IS_LINUX = platform.system() == "Linux"
 IS_MACOS = platform.system() == "Darwin"
@@ -47,17 +46,16 @@ if IS_MACOS:
         pass
 
 if platform.system() == "Windows":
-    print(CONDA_PREFIX)
-    if IS_CONDA_AVAILABLE:
+    if CONDA_PREFIX is not None:
         add_path(CONDA_PREFIX / "Library")
 
-    try:
-        proc = subprocess.run(["where", "vcpkg"], check=True, capture_output=True)
-        VCPKG_PREFIX = Path(proc.stdout.decode().strip()).parent
-        add_path(VCPKG_PREFIX / "installed" / "x64-windows")
-        print(list((VCPKG_PREFIX / "installed" / "x64-windows" / "include").iterdir()))
-    except Exception as e:  # vcpkg is not installed
-        print(e)
+    # try:
+    #     proc = subprocess.run(["where", "vcpkg"], check=True, capture_output=True)
+    #     VCPKG_PREFIX = Path(proc.stdout.decode().strip()).parent
+    #     add_path(VCPKG_PREFIX / "installed" / "x64-windows")
+    #     print(list((VCPKG_PREFIX / "installed" / "x64-windows" / "include").iterdir()))
+    # except Exception as e:  # vcpkg is not installed
+    #     print(e)
 
 libraries = ["rocksdb", SNAPPY_LIB, LZ4_LIB, ZLIB_LIB, ZSTD_LIB, BZ2_LIB]
 if IS_WIN:
