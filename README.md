@@ -22,12 +22,24 @@ TBD
 
 Pre-built binary
 
-- [`conda-forge`](https://anaconda.org/conda-forge/rocksdb) (available for Linux x64, MacOS x64 and ARM64, Windows x64): `conda install rocksdb -c conda-forge`
-- [Homebrew](https://formulae.brew.sh/formula/rocksdb) (MacOS only): `brew install rocksdb`
+On all platforms, from [`conda-forge`](https://anaconda.org/conda-forge/rocksdb)
+
+```bash
+conda install rocksdb -c conda-forge
+
+# on Windows, you also need to install zlib
+conda install zlib -c conda-forge
+```
+
+On MacOS (x64 and ARM64), from [Homebrew](https://formulae.brew.sh/formula/rocksdb)
+
+```bash
+brew install rocksdb
+```
 
 Build RocksDB from source: https://github.com/facebook/rocksdb/blob/main/INSTALL.md
 
-On Ubuntu, from source
+On Ubuntu, from source with dependencies from `apt-get`
 
 ```bash
 sudo apt-get -y install libsnappy-dev zlib1g-dev libbz2-dev liblz4-dev libzstd-dev
@@ -39,7 +51,7 @@ make static_lib -j $(nproc)
 On Windows, with vcpkg
 
 ```bash
-vcpkg install rocksdb[core,bzip2,lz4,snappy,zlib,zstd]:x64-windows
+vcpkg install rocksdb[core,bzip2,lz4,snappy,zlib,zstd]:x64-windows-static-md
 ```
 
 ### Build Python bindings (this repo)
@@ -48,6 +60,16 @@ vcpkg install rocksdb[core,bzip2,lz4,snappy,zlib,zstd]:x64-windows
 git clone https://github.com/gau-nernst/rocksdb-python
 cd rocksdb-python
 pip install .
+```
+
+`setup.py` assumes RocksDB was compiled with all dependencies enabled i.e. snappy, lz4, zlib, zstd, bz2.
+
+On Windows, RocksDB's dependencies library files may have different names depending on how you build them. To link them correctly, specify their names via environment variables.
+
+e.g. with RocksDB installed from conda-forge
+
+```bash
+LZ4_LIB=liblz4 BZ2_LIB=libbz2 pip install .
 ```
 
 # Basic usage
