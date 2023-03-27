@@ -34,7 +34,7 @@ if platform.system() == "Darwin":
         proc = subprocess.run(["brew", "--prefix"], check=True, capture_output=True)
         HOMEBREW_PREFIX = Path(proc.stdout.decode().strip())
         add_path(HOMEBREW_PREFIX)
-    except FileNotFoundError:
+    except FileNotFoundError:  # brew is not installed
         pass
 
 if platform.system() == "Windows":
@@ -43,7 +43,7 @@ if platform.system() == "Windows":
         VCPKG_PREFIX = Path(proc.stdout.decode().strip()).parent
         add_path(VCPKG_PREFIX / "installed" / "x64-windows")
         print(list((VCPKG_PREFIX / "installed" / "x64-windows" / "include").iterdir()))
-    except Exception as e:
+    except Exception as e:  # vcpkg is not installed
         print(e)
 
 libraries = ["rocksdb", "snappy", "z", "bz2", "lz4", "zstd"]
