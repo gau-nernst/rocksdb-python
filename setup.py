@@ -31,7 +31,7 @@ SNAPPY_LIB = os.environ.get("SNAPPY_LIB", "snappy")
 LZ4_LIB = os.environ.get("LZ4_LIB", "liblz4" if IS_WIN else "lz4")
 ZLIB_LIB = os.environ.get("ZLIB_LIB", "z")
 ZSTD_LIB = os.environ.get("ZSTD_LIB", "zstd")
-BZ2_LIB = os.environ.get("BZ2_LIB", "bz2")
+BZ2_LIB = os.environ.get("BZ2_LIB", "bzip2_static" if IS_WIN else "bz2")
 
 LOCAL_ROCKSDB_PATH = CURRENT_DIR / "rocksdb"
 if os.path.exists(LOCAL_ROCKSDB_PATH):
