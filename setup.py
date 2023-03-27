@@ -21,13 +21,6 @@ def add_path(path, include="include", lib="lib"):
 
 CURRENT_DIR = Path(__file__).parent
 
-try:
-    proc = subprocess.run(["conda", "info"], check=True, capture_output=True)
-    CONDA_PREFIX = Path(re.search(r"active env location : (.+)\n", proc.stdout.decode()).group(1))
-    add_path(CONDA_PREFIX)
-except:
-    pass
-
 LOCAL_ROCKSDB_PATH = CURRENT_DIR / "rocksdb"
 if os.path.exists(LOCAL_ROCKSDB_PATH):
     add_path(LOCAL_ROCKSDB_PATH, lib="")
@@ -51,7 +44,7 @@ if platform.system() == "Windows":
 
 libraries = ["rocksdb", "snappy", "lz4"]
 if platform.system() == "Windows":
-    libraries.extend(["Rpcrt4", "Shlwapi"]) # for port_win.cc
+    libraries.extend(["Rpcrt4", "Shlwapi"])  # for port_win.cc
     libraries.extend(["zlibstatic", "zstd_static"])
     # libraries.append("Cabinet") # for XPRESS
 else:
