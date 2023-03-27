@@ -48,13 +48,13 @@ if platform.system() == "Windows":
     except Exception as e:  # vcpkg is not installed
         print(e)
 
-libraries = ["rocksdb", "snappy", "lz4"]
+libraries = ["rocksdb", "snappy", "lz4", "z", "zstd"]
 if platform.system() == "Windows":
     libraries.extend(["Rpcrt4", "Shlwapi"])  # for port_win.cc
-    libraries.extend(["zlibstatic", "zstd_static"])
+    libraries.extend(["liblz4", "libbz2"])
     # libraries.append("Cabinet") # for XPRESS
 else:
-    libraries.extend(["bz2", "z", "zstd"])
+    libraries.extend(["lz4", "bz2"])
 
 
 ext = Pybind11Extension(
