@@ -7,6 +7,7 @@ from pathlib import Path
 from pybind11.setup_helpers import Pybind11Extension
 from setuptools import setup
 
+
 __version__ = "0.0.1"
 
 include_dirs = []
@@ -23,11 +24,21 @@ CURRENT_DIR = Path(__file__).parent
 IS_CONDA_AVAILABLE = subprocess.run(["conda", "info"]).returncode == 0
 CONDA_PREFIX = Path(os.environ["CONDA_PREFIX"]) if IS_CONDA_AVAILABLE else None
 
+IS_LINUX = platform.system() == "Linux"
+IS_MACOS = platform.system() == "Darwin"
+IS_WIN = platform.system() == "Windows"
+
+SNAPPY_LIB = os.environ.get("SNAPPY_LIB", "snappy")
+LZ4_LIB = os.environ.get("LZ4_LIB", "liblz4" if IS_WIN else "lz4")
+ZLIB_LIB = os.environ.get("ZLIB_LIB", "z")
+ZSTD_LIB = os.environ.get("ZSTD_LIB", "zstd")
+BZ2_LIB = os.environ.get("BZ2_LIB", "bz2")
+
 LOCAL_ROCKSDB_PATH = CURRENT_DIR / "rocksdb"
 if os.path.exists(LOCAL_ROCKSDB_PATH):
     add_path(LOCAL_ROCKSDB_PATH, lib="")
 
-if platform.system() == "Darwin":
+if IS_MACOS:
     try:
         proc = subprocess.run(["brew", "--prefix"], check=True, capture_output=True)
         HOMEBREW_PREFIX = Path(proc.stdout.decode().strip())
@@ -48,13 +59,10 @@ if platform.system() == "Windows":
     except Exception as e:  # vcpkg is not installed
         print(e)
 
-libraries = ["rocksdb", "snappy", "lz4", "z", "zstd"]
-if platform.system() == "Windows":
+libraries = ["rocksdb", SNAPPY_LIB, LZ4_LIB, ZLIB_LIB, ZSTD_LIB, BZ2_LIB]
+if IS_WIN:
     libraries.extend(["Rpcrt4", "Shlwapi"])  # for port_win.cc
-    libraries.extend(["liblz4", "libbz2"])
-    # libraries.append("Cabinet") # for XPRESS
-else:
-    libraries.extend(["lz4", "bz2"])
+    libraries.append("Cabinet")  # for XPRESS
 
 
 ext = Pybind11Extension(
