@@ -33,6 +33,14 @@ if platform.system() == "Darwin":
     except FileNotFoundError:
         pass
 
+if platform.system() == "Windows":
+    try:
+        proc = subprocess.run(["where", "vcpkg"], check=True, capture_output=True)
+        VCPKG_PREFIX = proc.stdout.decode().strip()
+        print(VCPKG_PREFIX)
+    except Exception as e:
+        print(e)
+
 libraries = ["rocksdb", "snappy", "z", "bz2", "lz4", "zstd"]
 if platform.system() == "Windows":
     libraries.append("Shlwapi")
