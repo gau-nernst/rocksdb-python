@@ -2,52 +2,10 @@ name: Build
 on:
   push:
     paths-ignore:
-      # - .github/workflows/build_rocksdb_*.yaml  # no point building Python bindings when new rocksdb lib is not built yet
       - .github/workflows/build_conda.yaml
       - README.md
       - .gitignore
       - .gitmodules
-
-# jobs:
-#   build:
-#     runs-on: ${{ matrix.os }}
-#     strategy:
-#       fail-fast: false
-#       matrix:
-#         os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
-
-#     steps:
-#       - name: Checkout
-#         uses: actions/checkout@v3
-#         with:
-#           submodules: true
-
-#       - name: Setup Python
-#         uses: actions/setup-python@v3
-
-#       - name: Download rocksdb library
-#         run: |
-#           python download_artifact.py --name=rocksdb_${{ runner.os }}
-#           unzip artifact.zip
-#         env:
-#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-#       - name: Install dependencies
-#         run: pip install pybind11 pytest
-
-#       - name: Set env vars on macOS
-#         if: runner.os == 'macOS'
-#         run: |
-#           echo CC=clang >> $GITHUB_ENV
-#           echo CXX=clang++ >> $GITHUB_ENV
-#           echo MACOSX_DEPLOYMENT_TARGET=10.13 >> $GITHUB_ENV
-#           echo "ARCHFLAGS=-arch x86_64 -arch arm64" >> $GITHUB_ENV
-
-#       - name: Build
-#         run: python setup.py build_ext -i
-
-#       - name: Test
-#         run: python -m pytest tests/
 
 jobs:
   build_ubuntu:
@@ -75,8 +33,8 @@ jobs:
           cp librocksdb.a build/
         env:
           PORTABLE: 1
-          EXTRA_CFLAGS: -fPIC
-          EXTRA_CXXFLAGS: -fPIC
+          # EXTRA_CFLAGS: -fPIC
+          # EXTRA_CXXFLAGS: -fPIC
 
       - name: Setup Python
         uses: actions/setup-python@v3
