@@ -42,6 +42,7 @@ if platform.system() == "Windows":
         proc = subprocess.run(["where", "vcpkg"], check=True, capture_output=True)
         VCPKG_PREFIX = Path(proc.stdout.decode().strip()).parent
         add_path(VCPKG_PREFIX / "installed" / "x64-windows")
+        print(list((VCPKG_PREFIX / "installed" / "x64-windows" / "include").iterdir()))
     except Exception as e:
         print(e)
 
