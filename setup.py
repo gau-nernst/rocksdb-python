@@ -1,5 +1,6 @@
 import os
 import platform
+import re
 import subprocess
 from glob import glob
 from pathlib import Path
@@ -20,10 +21,12 @@ def add_path(path, include="include", lib="lib"):
 
 CURRENT_DIR = Path(__file__).parent
 
-CONDA_PREFIX = os.environ.get("CONDA_PREFIX", None)
-if CONDA_PREFIX is not None:
-    CONDA_PREFIX = Path(CONDA_PREFIX)
+try:
+    proc = subprocess.run(["conda", "info"], check=True, capture_output=True)
+    CONDA_PREFIX = Path(re.search(r"active env location : (.+)\n", proc.stdout.decode()).group(1))
     add_path(CONDA_PREFIX)
+except:
+    pass
 
 LOCAL_ROCKSDB_PATH = CURRENT_DIR / "rocksdb"
 if os.path.exists(LOCAL_ROCKSDB_PATH):
