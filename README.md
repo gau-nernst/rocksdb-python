@@ -39,7 +39,7 @@ make static_lib -j $(nproc)
 On Windows, with vcpkg
 
 ```bash
-vcpkg install rocksdb:x64-windows
+vcpkg install rocksdb[core,bzip2,lz4,snappy,zlib,zstd]:x64-windows
 ```
 
 ### Build Python bindings (this repo)
