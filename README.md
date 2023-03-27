@@ -18,7 +18,14 @@ TBD
 
 ## From source
 
-Install RocksDB (https://github.com/facebook/rocksdb/blob/main/INSTALL.md)
+### Install RocksDB
+
+Pre-built binary
+
+- [`conda-forge`](https://anaconda.org/conda-forge/rocksdb) (available for Linux x64, MacOS x64 and ARM64, Windows x64): `conda install rocksdb -c conda-forge`
+- [Homebrew](https://formulae.brew.sh/formula/rocksdb) (MacOS only): `brew install rocksdb`
+
+Build RocksDB from source: https://github.com/facebook/rocksdb/blob/main/INSTALL.md
 
 On Ubuntu, from source
 
@@ -29,19 +36,13 @@ cd rocksdb
 make static_lib -j $(nproc)
 ```
 
-On MacOS, with Homebrew
-
-```bash
-brew install rocksdb
-```
-
 On Windows, with vcpkg
 
 ```bash
 vcpkg install rocksdb:x64-windows
 ```
 
-Build Python bindings (this repo)
+### Build Python bindings (this repo)
 
 ```bash
 git clone https://github.com/gau-nernst/rocksdb-python
