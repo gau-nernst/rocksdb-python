@@ -36,7 +36,9 @@ if platform.system() == "Windows":
     try:
         proc = subprocess.run(["where", "vcpkg"], check=True, capture_output=True)
         VCPKG_PREFIX = os.path.dirname(proc.stdout.decode().strip())
-        print(os.listdir(VCPKG_PREFIX))
+        print(VCPKG_PREFIX)
+        print(os.listdir(VCPKG_PREFIX + "/triplets"))
+        print(os.listdir(VCPKG_PREFIX + "/.vcpkg-root"))
         include_dirs.append(VCPKG_PREFIX + "/include")
         library_dirs.append(VCPKG_PREFIX + "/lib")
     except Exception as e:
