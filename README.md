@@ -62,7 +62,7 @@ brew install snappy lz4 zstd  # zlib and bzip2 come with MacOS
 git clone https://github.com/gau-nernst/rocksdb-python
 cd rocksdb-python
 git clone https://github.com/facebook/rocksdb --branch v8.0.0
-make -C rocksdb static_lib -j $(nproc)
+PORTABLE=1 EXTRA_CFLAGS=-fPIC EXTRA_CXXFLAGS=-fPIC make -C rocksdb static_lib -j $(nproc)
 pip install .
 ```
 
