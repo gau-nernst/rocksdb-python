@@ -1,6 +1,5 @@
 import os
 import platform
-import re
 import subprocess
 from glob import glob
 from pathlib import Path
@@ -21,6 +20,9 @@ def add_path(path, include="include", lib="lib"):
 
 CURRENT_DIR = Path(__file__).parent
 
+IS_CONDA_AVAILABLE = subprocess.run(["conda", "info"]).returncode == 0
+CONDA_PREFIX = Path(os.environ["CONDA_PREFIX"]) if IS_CONDA_AVAILABLE else None
+
 LOCAL_ROCKSDB_PATH = CURRENT_DIR / "rocksdb"
 if os.path.exists(LOCAL_ROCKSDB_PATH):
     add_path(LOCAL_ROCKSDB_PATH, lib="")
@@ -34,6 +36,10 @@ if platform.system() == "Darwin":
         pass
 
 if platform.system() == "Windows":
+    print(CONDA_PREFIX)
+    if IS_CONDA_AVAILABLE:
+        add_path(CONDA_PREFIX / "Library")
+
     try:
         proc = subprocess.run(["where", "vcpkg"], check=True, capture_output=True)
         VCPKG_PREFIX = Path(proc.stdout.decode().strip()).parent
