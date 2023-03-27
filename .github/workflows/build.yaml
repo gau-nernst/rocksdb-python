@@ -128,7 +128,7 @@ jobs:
         uses: microsoft/setup-msbuild@v1.1
 
       - name: Install RocksDB from vcpkg
-        run: vcpkg install rocksdb[core,bzip2,lz4,snappy,zlib,zstd]:x64-windows
+        run: vcpkg install rocksdb[core,bzip2,lz4,snappy,zlib,zstd]:x64-windows-static-md
 
       - name: Setup Python
         uses: actions/setup-python@v3
@@ -138,6 +138,8 @@ jobs:
 
       - name: Build
         run: pip install . -v
+        env:
+          ZLIB_LIB: zlib
 
       - name: Test
         run: pytest tests/

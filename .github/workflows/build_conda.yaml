@@ -29,7 +29,14 @@ jobs:
           channels: conda-forge
 
       - name: Install dependencies
-        run: conda install -q -y zlib rocksdb pytest
+        run: conda install -q -y rocksdb pytest
+
+      - name: Setup for Windows
+        if: runner.os == 'Windows'
+        run: |
+          conda install zlib
+          echo LZ4_LIB=liblz4 >> $GITHUB_ENV
+          echo BZ2_LIB=libbz2 >> $GITHUB_ENV
 
       - name: Build
         run: python -m pip install . -v

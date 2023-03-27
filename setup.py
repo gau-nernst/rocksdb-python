@@ -10,15 +10,6 @@ from setuptools import setup
 
 __version__ = "0.0.1"
 
-include_dirs = []
-library_dirs = []
-
-
-def add_path(path, include="include", lib="lib"):
-    include_dirs.append(str(path / include))
-    library_dirs.append(str(path / lib))
-
-
 CURRENT_DIR = Path(__file__).parent
 
 CONDA_PREFIX = Path(os.environ["CONDA_PREFIX"]) if "CONDA_PREFIX" in os.environ else None
@@ -28,14 +19,26 @@ IS_MACOS = platform.system() == "Darwin"
 IS_WIN = platform.system() == "Windows"
 
 SNAPPY_LIB = os.environ.get("SNAPPY_LIB", "snappy")
-LZ4_LIB = os.environ.get("LZ4_LIB", "liblz4" if IS_WIN else "lz4")
+LZ4_LIB = os.environ.get("LZ4_LIB", "lz4")
 ZLIB_LIB = os.environ.get("ZLIB_LIB", "z")
 ZSTD_LIB = os.environ.get("ZSTD_LIB", "zstd")
-BZ2_LIB = os.environ.get("BZ2_LIB", "bzip2_static" if IS_WIN else "bz2")
+BZ2_LIB = os.environ.get("BZ2_LIB", "bz2")
 
-LOCAL_ROCKSDB_PATH = CURRENT_DIR / "rocksdb"
-if os.path.exists(LOCAL_ROCKSDB_PATH):
-    add_path(LOCAL_ROCKSDB_PATH, lib="")
+include_dirs = []
+library_dirs = []
+
+
+def add_path(path, include="include", lib="lib"):
+    include_path = path / include
+    if include_path.exists():
+        include_dirs.append(str(include_path))
+
+    lib_path = path / lib
+    if lib_path.exists():
+        library_dirs.append(str(lib_path))
+
+
+add_path(CURRENT_DIR / "rocksdb", lib="")
 
 if IS_MACOS:
     try:
@@ -45,17 +48,15 @@ if IS_MACOS:
     except FileNotFoundError:  # brew is not installed
         pass
 
-if platform.system() == "Windows":
+if IS_WIN:
     if CONDA_PREFIX is not None:
         add_path(CONDA_PREFIX / "Library")
 
-    # try:
-    #     proc = subprocess.run(["where", "vcpkg"], check=True, capture_output=True)
-    #     VCPKG_PREFIX = Path(proc.stdout.decode().strip()).parent
-    #     add_path(VCPKG_PREFIX / "installed" / "x64-windows")
-    #     print(list((VCPKG_PREFIX / "installed" / "x64-windows" / "include").iterdir()))
-    # except Exception as e:  # vcpkg is not installed
-    #     print(e)
+    proc = subprocess.run(["where", "vcpkg"], capture_output=True)
+    if proc.returncode == 0:
+        VCPKG_PREFIX = Path(proc.stdout.decode().strip()).parent
+        add_path(VCPKG_PREFIX / "installed" / "x64-windows-static-md")
+
 
 libraries = ["rocksdb", SNAPPY_LIB, LZ4_LIB, ZLIB_LIB, ZSTD_LIB, BZ2_LIB]
 if IS_WIN:
