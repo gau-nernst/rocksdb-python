@@ -75,11 +75,11 @@ jobs:
 
       - name: Compile RocksDB
         run: |
-          cd rocksdb
-          make libsnappy.a liblz4.a libzstd.a -j $(sysctl -n hw.ncpu)
-          echo "CPATH=$CPATH:$(ls -d snappy-*/):$(ls -d snappy-*/build/)" >> $GITHUB_ENV
-          echo "CPATH=$CPATH:$(ls -d lz4-*/lib/)" >> $GITHUB_ENV
-          echo "CPATH=$CPATH:$(ls -d zstd-*/lib/):$(ls -d zstd-*/lib/dictBuilder/)" >> $GITHUB_ENV
+          cd rocksdb &&
+          make libsnappy.a liblz4.a libzstd.a -j $(sysctl -n hw.ncpu) &&
+          echo "CPATH=$CPATH:$(ls -d snappy-*/):$(ls -d snappy-*/build/)" >> $GITHUB_ENV &&
+          echo "CPATH=$CPATH:$(ls -d lz4-*/lib/)" >> $GITHUB_ENV &&
+          echo "CPATH=$CPATH:$(ls -d zstd-*/lib/):$(ls -d zstd-*/lib/dictBuilder/)" >> $GITHUB_ENV &&
           make static_lib -j $(sysctl -n hw.ncpu)
         env:
           DEBUG_LEVEL: 0
