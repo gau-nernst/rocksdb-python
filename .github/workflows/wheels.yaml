@@ -42,6 +42,7 @@ jobs:
 
           CIBW_BUILD_VERBOSITY: 1
           CIBW_BUILD: cp3{7..11}-${{ matrix.platform }}_*
+          CIBW_ARCHS_LINUX: x86_64
 
           CIBW_TEST_REQUIRES: pytest
           CIBW_TEST_COMMAND: pytest -v {project}/tests
