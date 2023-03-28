@@ -17,7 +17,8 @@ jobs:
       matrix:
         arch: [x86_64, arm64]
     env:
-      ARCHFLAG: -arch ${{ matrix.arch }}
+      CC: clang
+      CXX: clang++
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -39,6 +40,7 @@ jobs:
         env:
           DEBUG_LEVEL: 0
           LIB_MODE: static
+          ARCHFLAG: -arch ${{ matrix.arch }}
           PORTABLE: 1
           EXTRA_CFLAGS: -fPIC
           EXTRA_CXXFLAGS: -fPIC
