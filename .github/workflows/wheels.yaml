@@ -11,7 +11,7 @@ on:
 
 jobs:
   macos_x64:
-    runs-on: macos-latest
+    runs-on: macos-11
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -29,6 +29,8 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.12.1
         env:
+          MACOSX_DEPLOYMENT_TARGET: "11.0"
+
           CIBW_BUILD_VERBOSITY: 1
           CIBW_BUILD: cp{37,38,39,310,311}-macosx_x86_64
 
@@ -53,6 +55,7 @@ jobs:
       - name: Install RocksDB from Homebrew
         run: |
           brew fetch --force --bottle-tag=$BOTTLE_TAG rocksdb lz4 snappy zstd
+          brew uninstall lz4 snappy zstd
           brew install $(brew --cache --bottle-tag=$BOTTLE_TAG rocksdb)
           brew install $(brew --cache --bottle-tag=$BOTTLE_TAG lz4)
           brew install $(brew --cache --bottle-tag=$BOTTLE_TAG snappy)
