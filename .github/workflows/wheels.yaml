@@ -32,11 +32,11 @@ jobs:
 
       - name: Compile RocksDB
         run: |
-          make -C rocksdb libsnappy.a liblz4.a libzstd.a -j $(nproc)
-          echo "CPATH<<\n" >> $GITHUB_ENV
-          ls -d rocksdb/snappy-*/ rocksdb/snappy-*/build/ rocksdb/lz4-*/lib rocksdb/zstd-*/lib/ rocksdb/zstd-*/lib/dictBuilder/ >> $GITHUB_ENV
-          echo "\n" >> $GITHUB_ENV
-          make -C rocksdb static_lib -j $(nproc)
+          make -C rocksdb libsnappy.a liblz4.a libzstd.a -j $(sysctl -n hw.ncpu)
+          echo "CPATH=$CPATH:$(ls -d rocksdb/snappy-*/):$(rocksdb/snappy-*/build/)" >> $GITHUB_ENV
+          echo "CPATH=$CPATH:$(ls -d rocksdb/lz4-*/lib)" >> $GITHUB_ENV
+          echo "CPATH=$CPATH:$(ls -d rocksdb/zstd-*/lib/):$(rocksdb/zstd-*/lib/dictBuilder/)" >> $GITHUB_ENV
+          make -C rocksdb static_lib -j $(sysctl -n hw.ncpu)
         env:
           DEBUG_LEVEL: 0
           LIB_MODE: static
