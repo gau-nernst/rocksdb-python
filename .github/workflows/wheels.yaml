@@ -10,39 +10,8 @@ on:
       - .gitignore
 
 jobs:
-  wheels_macos:
+  macos_x64:
     runs-on: macos-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        # platform_id:
-        #   - manylinux_x86_64
-        #   - manylinux_aarch64
-        #   - macosx_universal2
-        #   - win_amd64
-        python: ["37", "38", "39", "310", "311"]
-        # include:
-        #   # Linux
-        #   - os: ubuntu-latest
-        #     platform_id: manylinux_x86_64
-        #   - os: ubuntu-latest
-        #     platform_id: manylinux_aarch64
-          
-        #   # macOS
-        #   - os: macos-latest
-        #     platform_id: macosx_universal2
-        #   - os: macos-latest
-        #     python: "37"
-        #     platform_id: macosx_x86_64
-
-        #   # Windows
-        #   - os: windows-latest
-        #     platform_id: win_amd64
-        
-        # exclude:
-        #   - platform_id: macosx_universal2
-        #     python: "37"
-
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -57,24 +26,43 @@ jobs:
           HOMEBREW_NO_INSTALL_CLEANUP: 1
           HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
 
-      - name: Setup Python
-        uses: actions/setup-python@v3
-
-      - name: Install cibuildwheel
-        run: pip install cibuildwheel
-
       - name: Build wheels
-        run: python -m cibuildwheel --output-dir wheelhouse
+        uses: pypa/cibuildwheel@v2.12.1
         env:
           CIBW_BUILD_VERBOSITY: 1
-
-          CIBW_BUILD: cp${{ matrix.python }}-macosx_x86_64
-          CIBW_ARCHS: all
+          CIBW_BUILD: cp{37,38,39,310,311}-macosx_x86_64
 
           CIBW_TEST_REQUIRES: pytest
           CIBW_TEST_COMMAND: pytest -v {project}/tests
-          # CIBW_TEST_SKIP: "*-macosx_universal2:arm64"
-        
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: wheels
+          path: ./wheelhouse/*.whl
+
+  macos_arm64:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Install RocksDB from Homebrew
+        run: brew install $(brew --cache --bottle-tag=arm64_big_sur rocksdb)
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: 1
+          HOMEBREW_NO_INSTALL_CLEANUP: 1
+          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.12.1
+        env:
+          CIBW_BUILD_VERBOSITY: 1
+          CIBW_BUILD: cp{38,39,310,311}-macosx_arm64
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
