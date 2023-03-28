@@ -19,6 +19,7 @@ jobs:
     env:
       CC: clang
       CXX: clang++
+      MACOSX_DEPLOYMENT_TARGET: "10.13"  # min required by RocksDB
     steps:
       - name: Checkout
         uses: actions/checkout@v3
