@@ -52,12 +52,17 @@ jobs:
 
       - name: Install RocksDB from Homebrew
         run: |
-          brew fetch --force --bottle-tag=arm64_big_sur rocksdb
-          brew install $(brew --cache --bottle-tag=arm64_big_sur rocksdb)
+          brew fetch --force --bottle-tag=$BOTTLE_TAG rocksdb lz4 snappy zstd
+          brew install $(brew --cache --bottle-tag=$BOTTLE_TAG rocksdb)
+          brew install $(brew --cache --bottle-tag=$BOTTLE_TAG lz4)
+          brew install $(brew --cache --bottle-tag=$BOTTLE_TAG snappy)
+          brew install $(brew --cache --bottle-tag=$BOTTLE_TAG zstd)
         env:
           HOMEBREW_NO_AUTO_UPDATE: 1
           HOMEBREW_NO_INSTALL_CLEANUP: 1
           HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
+
+          BOTTLE_TAG: arm64_big_sur
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.12.1
