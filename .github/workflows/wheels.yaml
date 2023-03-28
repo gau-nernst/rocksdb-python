@@ -21,8 +21,10 @@ jobs:
       - name: Set up Homebrew
         uses: Homebrew/actions/setup-homebrew@master
 
-      - name: Install RocksDB from Homebrew
-        run: brew install --build-from-source rocksdb
+      - name: Compile RocksDB from Homebrew
+        run: |
+          brew reinstall --build-from-source lz4 snappy zstd
+          brew install --build-from-source rocksdb
         env:
           HOMEBREW_NO_AUTO_UPDATE: 1
           HOMEBREW_NO_INSTALL_CLEANUP: 1
@@ -54,6 +56,7 @@ jobs:
 
       - name: Install RocksDB from Homebrew
         run: |
+          rm -rf "$(brew --cache)"
           brew fetch --force --bottle-tag=$BOTTLE_TAG rocksdb lz4 snappy zstd
           brew uninstall --ignore-dependencies lz4 snappy zstd
           brew install $(brew --cache --bottle-tag=$BOTTLE_TAG rocksdb)
