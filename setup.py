@@ -30,7 +30,6 @@ lib_names = {k: os.environ.get(k.upper() + "_LIB", v) for k, v in _default_lib_n
 
 include_dirs = []
 library_dirs = []
-extra_objects = []  # for static linking
 
 
 def add_path(path, include="include", lib="lib"):
@@ -51,13 +50,6 @@ if IS_MACOS:
         HOMEBREW_PREFIX = Path(proc.stdout.decode().strip())
         add_path(HOMEBREW_PREFIX)
 
-        # prefer static libs from Homebrew
-        # for k, v in lib_names.items():
-        #     static_lib_path = HOMEBREW_PREFIX / "lib" / f"lib{v}.a"
-        #     if static_lib_path.exists():
-        #         extra_objects.append(str(static_lib_path))
-        #         lib_names[k] = None
-
     except FileNotFoundError:  # brew is not installed
         pass
 
@@ -71,7 +63,7 @@ if IS_WIN:
         add_path(VCPKG_PREFIX / "installed" / "x64-windows-static-md")
 
 
-libraries = [lib for lib in lib_names.values() if lib is not None]
+libraries = [lib for lib in lib_names.values() if lib]
 if IS_WIN:
     libraries.extend(["Rpcrt4", "Shlwapi"])  # for port_win.cc
     libraries.append("Cabinet")  # for XPRESS
@@ -85,7 +77,6 @@ ext = Pybind11Extension(
     library_dirs=library_dirs,
     define_macros=[("VERSION_INFO", __version__)],
     cxx_std=17,
-    extra_objects=extra_objects,
 )
 
 setup(

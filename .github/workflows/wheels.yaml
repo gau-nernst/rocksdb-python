@@ -61,6 +61,45 @@ jobs:
           name: wheels
           path: ./wheelhouse/*.whl
 
+  windows:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - vcpkg-triplet: x64-windows-static-md
+            cibw-arch: AMD64
+          - vcpkg-triplet: x86-windows-static-md
+            cibw-arch: x86
+          - vcpkg-triplet: arm64-windows-static-md
+            cibw-arch: ARM64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Install RocksDB from vcpkg
+        run: vcpkg install rocksdb[core,bzip2,lz4,snappy,zlib,zstd]:${{ matrix.vcpkg-triplet }}
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.12.1
+        env:
+          CIBW_ENVIRONMENT_WINDOWS: ZLIB_LIB=zlib
+          CIBW_BUILD_VERBOSITY: 1
+          CIBW_BUILD: cp3{7..11}-*
+          CIBW_ARCHS_WINDOWS: ${{ matrix.cibw-arch }}
+
+          CIBW_TEST_REQUIRES: pytest
+          CIBW_TEST_COMMAND: pytest -v {project}/tests
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: wheels
+          path: ./wheelhouse/*.whl
+
   # publish_wheels:
   #   name: Publish wheels
   #   if: github.event.inputs.make_release == 'true'
