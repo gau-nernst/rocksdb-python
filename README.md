@@ -1,10 +1,8 @@
 # RocksDB Python
 
-[![Build RocksDB Linux](https://github.com/gau-nernst/rocksdb-python/actions/workflows/build_rocksdb_linux.yaml/badge.svg)](https://github.com/gau-nernst/rocksdb-python/actions/workflows/build_rocksdb_linux.yaml)
-[![Build RocksDB macOS](https://github.com/gau-nernst/rocksdb-python/actions/workflows/build_rocksdb_mac.yaml/badge.svg)](https://github.com/gau-nernst/rocksdb-python/actions/workflows/build_rocksdb_mac.yaml)
-[![Build RocksDB Windows](https://github.com/gau-nernst/rocksdb-python/actions/workflows/build_rocksdb_win.yaml/badge.svg)](https://github.com/gau-nernst/rocksdb-python/actions/workflows/build_rocksdb_win.yaml)
-
 [![Build](https://github.com/gau-nernst/rocksdb-python/actions/workflows/build.yaml/badge.svg)](https://github.com/gau-nernst/rocksdb-python/actions/workflows/build.yaml)
+
+[![Build with conda](https://github.com/gau-nernst/rocksdb-python/actions/workflows/build_conda.yaml/badge.svg)](https://github.com/gau-nernst/rocksdb-python/actions/workflows/build_conda.yaml)
 
 Cross-platform Python bindings for [RocksDB](https://github.com/facebook/rocksdb). Other RocksDB Python bindings libraries usually don't provide Windows builds. This repo aims to target all OSes, including Windows.
 
@@ -18,42 +16,81 @@ TBD
 
 ## From source
 
-Build RocksDB
+### Inside a conda environment (easiest)
 
-You need to build RocksDB (and optionally 3rd-party compression libraries) from source. Refer to the [official instructions](https://github.com/facebook/rocksdb/blob/main/INSTALL.md) for more information. Additionally, you can also refer to [Building on Windows](https://github.com/facebook/rocksdb/wiki/Building-on-Windows) if you are building on Windows.
-
-```bash
-# on Linux and macOS
-git clone --recursive https://github.com/gau-nernst/rocksdb-python
-cd rocksdb-python/rocksdb   # rocksdb v7.3.1
-make static_lib -j4
-cp librocksdb.a ..
-```
-
-I have GitHub Actions Workflows that build RocksDB binaries and all supported 3rd-party compression libraries. Refer to [`.github/workflows/build_rocksdb_{linux/mac/win}.yaml`](.github/workflows/) for my specific build commands. Thus you can also download my pre-built binaries from [GitHub Actions](https://github.com/gau-nernst/rocksdb-python/actions) (look for the artifacts under **Build RocksDB for Linux/macOS/Windows**). macOS builds are universal2 (support both Apple Intel x86_64 and Apple Silicon ARM64).
-
-OS | Arch | Snappy | LZ4 | Zlib | Zstd | Bzip2 | XPRESS
----|--------------|--------|-----|------|------|-------|--------
-Linux | x86_64 | ✅ | ✅ | ✅ | ✅ | ✅ | 
-macOS | universal2 | ✅ | ✅ | ✅ | ✅ | ✅ | 
-Windows | x86_64 | ✅ | ✅ | ✅ | ✅ | | ✅ (comes with Windows)
-
-Place the built binaries in the root directory of this repo. e.g. `librocksdb.a` on Linux and macOS, `rocksdb.lib` on Windows.
-
-Build Python bindings (this repo)
+[`conda-forge`](https://anaconda.org/conda-forge/rocksdb) provides pre-built RocksDB for Linux x64, MacOS x64 and ARM64, Windows x64.
 
 ```bash
-# if you haven't cloned
-git clone --recursive https://github.com/gau-nernst/rocksdb-python
+# on Linux and MacOS
+conda install rocksdb -c conda-forge
+git clone https://github.com/gau-nernst/rocksdb-python
 cd rocksdb-python
+pip install .
 
-pip install pybind11
-python setup.py build_ext -i
-# on macOS, add MACOSX_DEPLOYMENT_TARGET=10.13, follows RocksDB
-# MACOSX_DEPLOYMENT_TARGET=10.13 python setup.py build_ext -i
+# on Windows
+conda install rocksdb zlib -c conda-forge
+git clone https://github.com/gau-nernst/rocksdb-python
+cd rocksdb-python
+LZ4_LIB=liblz4 BZ2_LIB=libbz2 pip install .
 ```
 
-The `rocksdb` submodule should be in the same commit as the commit used to build RocksDB in the previous step (or even better, same release version). This is to make sure RocksDB's header files are consistent with the RocksDB binary.
+### With Homebrew (MacOS only)
+
+[Homebrew](https://formulae.brew.sh/formula/rocksdb) provides pre-built RocksDB for MacOS, both x64 and ARM64.
+
+```bash
+brew install rocksdb
+
+git clone https://github.com/gau-nernst/rocksdb-python
+cd rocksdb-python
+pip install .
+```
+
+### Build RocksDB from source
+
+Refer to: https://github.com/facebook/rocksdb/blob/main/INSTALL.md
+
+On Linux and MacOS, you can install RocksDB's dependencies and compile RocksDB with `make`.
+
+```bash
+# install dependencies on Ubuntu
+sudo apt-get -y install libsnappy-dev zlib1g-dev libbz2-dev liblz4-dev libzstd-dev
+
+# install dependencies on MacOS with Homebrew
+brew install snappy lz4 zstd  # zlib and bzip2 come with MacOS
+
+git clone https://github.com/gau-nernst/rocksdb-python
+cd rocksdb-python
+git clone https://github.com/facebook/rocksdb --branch v8.0.0
+PORTABLE=1 EXTRA_CFLAGS=-fPIC EXTRA_CXXFLAGS=-fPIC make -C rocksdb static_lib -j $(nproc)
+pip install .
+```
+
+On Windows, you can install RocksDB and its dependencies with vcpkg. Make sure to use triplet `x64-windows-static-md`.
+
+```bash
+vcpkg install rocksdb[core,bzip2,lz4,snappy,zlib,zstd]:x64-windows-static-md
+
+git clone https://github.com/gau-nernst/rocksdb-python
+cd rocksdb-python
+ZLIB_LIB=zlib pip install .
+```
+
+### Other notes
+
+`setup.py` assumes RocksDB was compiled with all dependencies enabled i.e. snappy, lz4, zlib, zstd, bz2. It will also try to add header and library paths for linking:
+
+- On all platforms: `./rocksdb` for source build; `$CONDA_PREFIX$` for conda libs (automatically added by conda)
+- On Windows: `$CONDA_PREFIX$/Library/` for conda libs, `VCPKG_ROOT/installed/x64-windows-static-md` for vcpkg libs
+- On MacOS: `$(brew --prefix)` for Homebrew libs
+
+On Windows, RocksDB's dependencies library files may have different names depending on how you build them. To link them correctly, specify their names via environment variables.
+
+e.g. with RocksDB installed from conda-forge
+
+```bash
+LZ4_LIB=liblz4 BZ2_LIB=libbz2 pip install .
+```
 
 # Basic usage
 

@@ -1,38 +1,81 @@
+import os
 import platform
+import subprocess
 from glob import glob
+from pathlib import Path
 
 from pybind11.setup_helpers import Pybind11Extension
 from setuptools import setup
 
-IS_WIN = platform.system() == "Windows"
+
 __version__ = "0.0.1"
 
+CURRENT_DIR = Path(__file__).parent
 
-def get_libraries():
-    libraries = ["rocksdb", "lz4", "snappy"]
-    if IS_WIN:
-        libraries.extend(["Rpcrt4", "Shlwapi"]) # for port_win.cc
-        libraries.extend(["zlibstatic", "zstd_static"])
-        libraries.append("Cabinet") # for XPRESS
-    else:
-        libraries.extend(["bz2", "z", "zstd"])
-    return libraries
+CONDA_PREFIX = Path(os.environ["CONDA_PREFIX"]) if "CONDA_PREFIX" in os.environ else None
+
+IS_LINUX = platform.system() == "Linux"
+IS_MACOS = platform.system() == "Darwin"
+IS_WIN = platform.system() == "Windows"
+
+SNAPPY_LIB = os.environ.get("SNAPPY_LIB", "snappy")
+LZ4_LIB = os.environ.get("LZ4_LIB", "lz4")
+ZLIB_LIB = os.environ.get("ZLIB_LIB", "z")
+ZSTD_LIB = os.environ.get("ZSTD_LIB", "zstd")
+BZ2_LIB = os.environ.get("BZ2_LIB", "bz2")
+
+include_dirs = []
+library_dirs = []
 
 
-ext_m = Pybind11Extension(
+def add_path(path, include="include", lib="lib"):
+    include_path = path / include
+    if include_path.exists():
+        include_dirs.append(str(include_path))
+
+    lib_path = path / lib
+    if lib_path.exists():
+        library_dirs.append(str(lib_path))
+
+
+add_path(CURRENT_DIR / "rocksdb", lib="")
+
+if IS_MACOS:
+    try:
+        proc = subprocess.run(["brew", "--prefix"], check=True, capture_output=True)
+        HOMEBREW_PREFIX = Path(proc.stdout.decode().strip())
+        add_path(HOMEBREW_PREFIX)
+    except FileNotFoundError:  # brew is not installed
+        pass
+
+if IS_WIN:
+    if CONDA_PREFIX is not None:
+        add_path(CONDA_PREFIX / "Library")
+
+    proc = subprocess.run(["where", "vcpkg"], capture_output=True)
+    if proc.returncode == 0:
+        VCPKG_PREFIX = Path(proc.stdout.decode().strip()).parent
+        add_path(VCPKG_PREFIX / "installed" / "x64-windows-static-md")
+
+
+libraries = ["rocksdb", SNAPPY_LIB, LZ4_LIB, ZLIB_LIB, ZSTD_LIB, BZ2_LIB]
+if IS_WIN:
+    libraries.extend(["Rpcrt4", "Shlwapi"])  # for port_win.cc
+    libraries.append("Cabinet")  # for XPRESS
+
+
+ext = Pybind11Extension(
     "rocksdb_python",
     sorted(glob("src/*.cpp")),
-    include_dirs=["rocksdb/include"],
-    libraries=get_libraries(),
-    library_dirs=["."],
+    include_dirs=include_dirs,
+    libraries=libraries,
+    library_dirs=library_dirs,
     define_macros=[("VERSION_INFO", __version__)],
     cxx_std=17,
 )
-ext_modules = [ext_m]
 
 setup(
     name="rocksdb-python",
     version=__version__,
-    ext_modules=ext_modules,
-    packages=["rocksdb_python"],
+    ext_modules=[ext],
 )

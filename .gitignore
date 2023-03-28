@@ -1,8 +1,5 @@
-*.a
-*.lib
-*.so
-*.pyd
-*.o
-*.obj
-
+build/
+*.egg-info/
 *.db
+
+__pycache__/
