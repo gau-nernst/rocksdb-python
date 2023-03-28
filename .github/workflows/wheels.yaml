@@ -10,6 +10,48 @@ on:
       - .gitignore
 
 jobs:
+  linux:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [manylinux, musllinux]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Checkout RocksDB
+        uses: actions/checkout@v3
+        with:
+          repository: facebook/rocksdb
+          ref: v8.0.0
+          path: rocksdb
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.12.1
+        env:
+          CIBW_BEFORE_ALL_LINUX: >
+            cd {project}/rocksdb
+            make rocksdbjavastatic_deps -j $(nproc)
+            echo "CPATH=$CPATH:$(ls -d zlib-*/)" >> $GITHUB_ENV
+            echo "CPATH=$CPATH:$(ls -d bzip2-*/)" >> $GITHUB_ENV
+            echo "CPATH=$CPATH:$(ls -d snappy-*/):$(ls -d snappy-*/build/)" >> $GITHUB_ENV
+            echo "CPATH=$CPATH:$(ls -d lz4-*/lib/)" >> $GITHUB_ENV
+            echo "CPATH=$CPATH:$(ls -d zstd-*/lib/):$(ls -d zstd-*/lib/dictBuilder/)" >> $GITHUB_ENV
+            PORTABLE=1 EXTRA_CFLAGS=-fPIC EXTRA_CXXFLAGS=-fPIC make static_lib -j $(npoc)
+
+          CIBW_BUILD_VERBOSITY: 1
+          CIBW_BUILD: cp3{7..11}-${{ matrix.platform }}_*
+
+          CIBW_TEST_REQUIRES: pytest
+          CIBW_TEST_COMMAND: pytest -v {project}/tests
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: wheels
+          path: ./wheelhouse/*.whl
+
   macos:
     runs-on: macos-latest
     strategy:
@@ -33,11 +75,12 @@ jobs:
 
       - name: Compile RocksDB
         run: |
-          make -C rocksdb libsnappy.a liblz4.a libzstd.a -j $(sysctl -n hw.ncpu)
-          echo "CPATH=$CPATH:$(ls -d rocksdb/snappy-*/):$(ls -d rocksdb/snappy-*/build/)" >> $GITHUB_ENV
-          echo "CPATH=$CPATH:$(ls -d rocksdb/lz4-*/lib/)" >> $GITHUB_ENV
-          echo "CPATH=$CPATH:$(ls -d rocksdb/zstd-*/lib/):$(ls -d rocksdb/zstd-*/lib/dictBuilder/)" >> $GITHUB_ENV
-          make -C rocksdb static_lib -j $(sysctl -n hw.ncpu)
+          cd rocksdb
+          make libsnappy.a liblz4.a libzstd.a -j $(sysctl -n hw.ncpu)
+          echo "CPATH=$CPATH:$(ls -d snappy-*/):$(ls -d snappy-*/build/)" >> $GITHUB_ENV
+          echo "CPATH=$CPATH:$(ls -d lz4-*/lib/)" >> $GITHUB_ENV
+          echo "CPATH=$CPATH:$(ls -d zstd-*/lib/):$(ls -d zstd-*/lib/dictBuilder/)" >> $GITHUB_ENV
+          make static_lib -j $(sysctl -n hw.ncpu)
         env:
           DEBUG_LEVEL: 0
           LIB_MODE: static
@@ -81,7 +124,7 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1.1
 
-      - name: Install RocksDB from vcpkg
+      - name: Build RocksDB from vcpkg
         run: vcpkg install rocksdb[core,bzip2,lz4,snappy,zlib,zstd]:${{ matrix.vcpkg-triplet }}
 
       - name: Build wheels
