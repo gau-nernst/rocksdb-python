@@ -52,11 +52,11 @@ if IS_MACOS:
         add_path(HOMEBREW_PREFIX)
 
         # prefer static libs from Homebrew
-        for k, v in lib_names.items():
-            static_lib_path = HOMEBREW_PREFIX / "lib" / f"lib{v}.a"
-            if static_lib_path.exists():
-                extra_objects.append(str(static_lib_path))
-                lib_names[k] = None
+        # for k, v in lib_names.items():
+        #     static_lib_path = HOMEBREW_PREFIX / "lib" / f"lib{v}.a"
+        #     if static_lib_path.exists():
+        #         extra_objects.append(str(static_lib_path))
+        #         lib_names[k] = None
 
     except FileNotFoundError:  # brew is not installed
         pass
