@@ -5,6 +5,7 @@ on:
       - .github/workflows/build_conda.yaml
       - .github/workflows/build_linux.yaml
       - .github/workflows/build_macos_homebrew.yaml
+      - .github/workflows/wheels.yaml
       - README.md
       - .gitignore
 

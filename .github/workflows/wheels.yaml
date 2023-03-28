@@ -1,0 +1,102 @@
+name: Build wheels
+on:
+  push:
+    paths-ignore:
+      - .github/workflows/build_conda.yaml
+      - .github/workflows/build_linux.yaml
+      - .github/workflows/build_macos_homebrew.yaml
+      - .github/workflows/build_windows_vcpkg.yaml
+      - README.md
+      - .gitignore
+
+jobs:
+  wheels_macos:
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # platform_id:
+        #   - manylinux_x86_64
+        #   - manylinux_aarch64
+        #   - macosx_universal2
+        #   - win_amd64
+        python: ["37", "38", "39", "310", "311"]
+        # include:
+        #   # Linux
+        #   - os: ubuntu-latest
+        #     platform_id: manylinux_x86_64
+        #   - os: ubuntu-latest
+        #     platform_id: manylinux_aarch64
+          
+        #   # macOS
+        #   - os: macos-latest
+        #     platform_id: macosx_universal2
+        #   - os: macos-latest
+        #     python: "37"
+        #     platform_id: macosx_x86_64
+
+        #   # Windows
+        #   - os: windows-latest
+        #     platform_id: win_amd64
+        
+        # exclude:
+        #   - platform_id: macosx_universal2
+        #     python: "37"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Install RocksDB from Homebrew
+        run: brew install rocksdb
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: 1
+          HOMEBREW_NO_INSTALL_CLEANUP: 1
+          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
+
+      - name: Setup Python
+        uses: actions/setup-python@v3
+
+      - name: Install cibuildwheel
+        run: pip install cibuildwheel
+
+      - name: Build wheels
+        run: python -m cibuildwheel --output-dir wheelhouse
+        env:
+          CIBW_BUILD_VERBOSITY: 1
+
+          CIBW_BUILD: cp${{ matrix.python }}-macosx_x86_64
+          CIBW_ARCHS: all
+
+          CIBW_TEST_REQUIRES: pytest
+          CIBW_TEST_COMMAND: pytest -v {project}/tests
+          # CIBW_TEST_SKIP: "*-macosx_universal2:arm64"
+        
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: wheels
+          path: ./wheelhouse/*.whl
+
+  # publish_wheels:
+  #   name: Publish wheels
+  #   if: github.event.inputs.make_release == 'true'
+  #   needs: build_wheels
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
+  #       with:
+  #         submodules: recursive
+  #     - name: Download artifacts
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: wheels
+  #         path: wheelhouse
+  #     - name: Create release
+  #       run: gh release create ${{ github.event.inputs.tag }} ./wheelhouse/*.whl --generate-notes
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
