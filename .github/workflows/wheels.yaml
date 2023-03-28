@@ -17,7 +17,6 @@ jobs:
       matrix:
         arch: [x86_64, arm64]
     env:
-      MACOSX_DEPLOYMENT_TARGET: "10.9"
       ARCHFLAG: -arch ${{ matrix.arch }}
     steps:
       - name: Checkout
@@ -40,6 +39,9 @@ jobs:
         env:
           DEBUG_LEVEL: 0
           LIB_MODE: static
+          PORTABLE: 1
+          EXTRA_CFLAGS: -fPIC
+          EXTRA_CXXFLAGS: -fPIC
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.12.1
