@@ -51,7 +51,9 @@ jobs:
         uses: Homebrew/actions/setup-homebrew@master
 
       - name: Install RocksDB from Homebrew
-        run: brew install $(brew --cache --bottle-tag=arm64_big_sur rocksdb)
+        run: |
+          brew fetch --force --bottle-tag=arm64_big_sur rocksdb
+          brew install $(brew --cache --bottle-tag=arm64_big_sur rocksdb)
         env:
           HOMEBREW_NO_AUTO_UPDATE: 1
           HOMEBREW_NO_INSTALL_CLEANUP: 1
