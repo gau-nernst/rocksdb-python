@@ -57,10 +57,15 @@ if IS_WIN:
     if CONDA_PREFIX is not None:
         add_path(CONDA_PREFIX / "Library")
 
+    MSVC_TOOLCHAIN = "x64"
+    proc = subprocess.run(["where", "cl"], capture_output=True)
+    if proc.returncode == 0:
+        MSVC_TOOLCHAIN = proc.stdout.decode().strip().split("\\")[-2].lower()
+
     proc = subprocess.run(["where", "vcpkg"], capture_output=True)
     if proc.returncode == 0:
         VCPKG_PREFIX = Path(proc.stdout.decode().strip()).parent
-        add_path(VCPKG_PREFIX / "installed" / "x64-windows-static-md")
+        add_path(VCPKG_PREFIX / "installed" / MSVC_TOOLCHAIN + "-windows-static-md")
 
 
 libraries = [lib for lib in lib_names.values() if lib]
