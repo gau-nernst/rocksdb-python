@@ -78,7 +78,11 @@ ZLIB_LIB=zlib pip install .
 
 ### Other notes
 
-`setup.py` assumes RocksDB was compiled with all dependencies enabled i.e. snappy, lz4, zlib, zstd, bz2.
+`setup.py` assumes RocksDB was compiled with all dependencies enabled i.e. snappy, lz4, zlib, zstd, bz2. It will also try to add header and library paths for linking:
+
+- On all platforms: `./rocksdb` for source build; `$CONDA_PREFIX$` for conda libs (automatically added by conda)
+- On Windows: `$CONDA_PREFIX$/Library/` for conda libs, `VCPKG_ROOT/installed/x64-windows-static-md` for vcpkg libs
+- On MacOS: `$(brew --prefix)` for Homebrew libs
 
 On Windows, RocksDB's dependencies library files may have different names depending on how you build them. To link them correctly, specify their names via environment variables.
 
