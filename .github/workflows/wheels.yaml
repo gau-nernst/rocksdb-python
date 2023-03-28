@@ -32,9 +32,9 @@ jobs:
       - name: Compile RocksDB
         run: |
           make -C rocksdb libsnappy.a liblz4.a libzstd.a -j $(sysctl -n hw.ncpu)
-          echo "CPATH=$CPATH:$(ls -d rocksdb/snappy-*/):$(rocksdb/snappy-*/build/)" >> $GITHUB_ENV
-          echo "CPATH=$CPATH:$(ls -d rocksdb/lz4-*/lib)" >> $GITHUB_ENV
-          echo "CPATH=$CPATH:$(ls -d rocksdb/zstd-*/lib/):$(rocksdb/zstd-*/lib/dictBuilder/)" >> $GITHUB_ENV
+          echo "CPATH=$CPATH:$(ls -d rocksdb/snappy-*/):$(ls -d rocksdb/snappy-*/build/)" >> $GITHUB_ENV
+          echo "CPATH=$CPATH:$(ls -d rocksdb/lz4-*/lib/)" >> $GITHUB_ENV
+          echo "CPATH=$CPATH:$(ls -d rocksdb/zstd-*/lib/):$(ls -d rocksdb/zstd-*/lib/dictBuilder/)" >> $GITHUB_ENV
           make -C rocksdb static_lib -j $(sysctl -n hw.ncpu)
         env:
           DEBUG_LEVEL: 0
@@ -47,7 +47,7 @@ jobs:
         uses: pypa/cibuildwheel@v2.12.1
         env:
           CIBW_BUILD_VERBOSITY: 1
-          CIBW_BUILD: cp*
+          CIBW_BUILD: cp3{7..11}-*
           CIBW_ARCHS_MACOS: ${{ matrix.arch }}
 
           CIBW_TEST_REQUIRES: pytest
