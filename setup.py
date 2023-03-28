@@ -65,7 +65,7 @@ if IS_WIN:
     proc = subprocess.run(["where", "vcpkg"], capture_output=True)
     if proc.returncode == 0:
         VCPKG_PREFIX = Path(proc.stdout.decode().strip()).parent
-        add_path(VCPKG_PREFIX / "installed" / MSVC_TOOLCHAIN + "-windows-static-md")
+        add_path(VCPKG_PREFIX / "installed" / f"{MSVC_TOOLCHAIN}-windows-static-md")
 
 
 libraries = [lib for lib in lib_names.values() if lib]
