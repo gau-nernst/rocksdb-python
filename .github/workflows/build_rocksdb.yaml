@@ -85,10 +85,13 @@ jobs:
 
   windows:
     runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64, ARM64]
     env:
-      CMAKE_FLAGS: -G "Visual Studio 17 2022" -A x64 -DCMAKE_GENERATOR_PLATFORM=x64 -DCMAKE_BUILD_TYPE=Release
-      MSBUILD_FLAGS: /m /p:Configuration=Release /p:Platform=x64
-
+      CMAKE_FLAGS: -G "Visual Studio 17 2022" -A x64 -DCMAKE_GENERATOR_PLATFORM=${{ matrix.arch }} -DCMAKE_BUILD_TYPE=Release
+      MSBUILD_FLAGS: /m /p:Configuration=Release
     steps:
       - name: Checkout RocksDB
         uses: actions/checkout@v3
@@ -138,25 +141,14 @@ jobs:
           mkdir build
           cd build
           cmake ${{ env.CMAKE_FLAGS }} -DWITH_SNAPPY=1 -DWITH_LZ4=1 -DWITH_ZLIB=1 -DWITH_ZSTD=1 -DXPRESS=1 `
-            -DPORTABLE=1 -DROCKSDB_BUILD_SHARED=0 -DWITH_BENCHMARK_TOOLS=0 -DWITH_CORE_TOOLS=0 -DWITH_TOOLS=0 ../
+            -DPORTABLE=1 -DROCKSDB_BUILD_SHARED=0 -DWITH_BENCHMARK_TOOLS=0 -DWITH_TRACE_TOOLS=0 -DWITH_CORE_TOOLS=0 -DWITH_TOOLS=0 ../
           msbuild rocksdb.sln ${{ env.MSBUILD_FLAGS }}
           cp Release/*.lib ../..
         env:
-          # ZLIB_HOME: zlib
           ZLIB_INCLUDE: zlib;zlib/build
-          # ZLIB_LIB_RELEASE: zlibstatic.lib
-
-          # SNAPPY_HOME: snappy
           SNAPPY_INCLUDE: snappy;snappy/build
-          # SNAPPY_LIB_RELEASE: snappy.lib
-
-          # LZ4_HOME: lz4
           LZ4_INCLUDE: lz4/lib
-          # LZ4_LIB_RELEASE: lz4.lib
-
-          # ZSTD_HOME: zstd
           ZSTD_INCLUDE: zstd/lib;zstd/lib/dictBuilder
-          # ZSTD_LIB_RELEASE: zstd_static.lib
 
       - name: Upload built libs
         uses: actions/upload-artifact@v3
