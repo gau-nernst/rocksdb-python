@@ -142,21 +142,21 @@ jobs:
           msbuild rocksdb.sln ${{ env.MSBUILD_FLAGS }}
           cp Release/*.lib ../..
         env:
-          ZLIB_HOME: ./zlib
-          ZLIB_INCLUDE: ./zlib;./zlib/build
-          ZLIB_LIB_RELEASE: ./zlibstatic.lib
+          # ZLIB_HOME: zlib
+          ZLIB_INCLUDE: zlib;zlib/build
+          # ZLIB_LIB_RELEASE: zlibstatic.lib
 
-          SNAPPY_HOME: ./snappy
-          SNAPPY_INCLUDE: ./snappy;./snappy/build
-          SNAPPY_LIB_RELEASE: ./snappy.lib
+          # SNAPPY_HOME: snappy
+          SNAPPY_INCLUDE: snappy;snappy/build
+          # SNAPPY_LIB_RELEASE: snappy.lib
 
-          LZ4_HOME: ./lz4
-          LZ4_INCLUDE: ./lz4/lib
-          LZ4_LIB_RELEASE: ./lz4.lib
+          # LZ4_HOME: lz4
+          LZ4_INCLUDE: lz4/lib
+          # LZ4_LIB_RELEASE: lz4.lib
 
-          ZSTD_HOME: ./zstd
-          ZSTD_INCLUDE: ./zstd/lib;./zstd/lib/dictBuilder
-          ZSTD_LIB_RELEASE: ./zstd_static.lib
+          # ZSTD_HOME: zstd
+          ZSTD_INCLUDE: zstd/lib;zstd/lib/dictBuilder
+          # ZSTD_LIB_RELEASE: zstd_static.lib
 
       - name: Upload built libs
         uses: actions/upload-artifact@v3
