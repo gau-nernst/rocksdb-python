@@ -3,3 +3,4 @@ build/
 *.db
 
 __pycache__/
+rocksdb/

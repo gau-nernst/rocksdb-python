@@ -12,8 +12,6 @@ __version__ = "0.0.1"
 
 CURRENT_DIR = Path(__file__).parent
 
-CONDA_PREFIX = Path(os.environ["CONDA_PREFIX"]) if "CONDA_PREFIX" in os.environ else None
-
 IS_LINUX = platform.system() == "Linux"
 IS_MACOS = platform.system() == "Darwin"
 IS_WIN = platform.system() == "Windows"
@@ -44,25 +42,13 @@ def add_path(path, include="include", lib="lib"):
 
 add_path(CURRENT_DIR / "rocksdb", lib="")
 
-if IS_MACOS:
-    try:
-        proc = subprocess.run(["brew", "--prefix"], check=True, capture_output=True)
-        HOMEBREW_PREFIX = Path(proc.stdout.decode().strip())
-        add_path(HOMEBREW_PREFIX)
+if IS_MACOS and subprocess.run(["which", "brew"]).returncode == 0:
+    proc = subprocess.run(["brew", "--prefix"], check=True, capture_output=True)
+    HOMEBREW_PREFIX = Path(proc.stdout.decode().strip())
+    add_path(HOMEBREW_PREFIX)
 
-    except FileNotFoundError:  # brew is not installed
-        pass
-
-if IS_WIN:
-    if CONDA_PREFIX is not None:
-        add_path(CONDA_PREFIX / "Library")
-
-    proc = subprocess.run(["where", "vcpkg"], capture_output=True)
-    if proc.returncode == 0:
-        VCPKG_PREFIX = Path(proc.stdout.decode().strip()).parent
-        print(f"Output of platform.machine(): {platform.machine()}")
-        arch = dict(AMD64="x64", x86="x86")[platform.machine()]
-        add_path(VCPKG_PREFIX / "installed" / f"{arch}-windows-static-md")
+if IS_WIN and "CONDA_PREFIX" in os.environ:
+    add_path(Path(os.environ["CONDA_PREFIX"]) / "Library")
 
 
 libraries = [lib for lib in lib_names.values() if lib]
