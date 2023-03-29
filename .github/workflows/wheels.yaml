@@ -131,7 +131,7 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.12.1
         env:
-          CIBW_BEFORE_BUILD: where cl
+          CIBW_BEFORE_BUILD: echo $PATH
 
           CIBW_ENVIRONMENT_WINDOWS: ZLIB_LIB=zlib
           CIBW_BUILD_VERBOSITY: 1
