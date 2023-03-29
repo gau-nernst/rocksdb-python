@@ -1,13 +1,12 @@
 name: Build RocksDB
 on:
   push:
-    paths-ignore:
-      - .github/workflows/build_conda.yaml
-      - .github/workflows/build_linux.yaml
-      - .github/workflows/build_macos_homebrew.yaml
-      - .github/workflows/build_windows_vcpkg.yaml
-      - README.md
-      - .gitignore
+    paths:
+      - '!.github/workflows/*'
+      - .github/workflows/build_rocksdb.yaml
+      - setup.py
+      - src/*
+      - tests/*
 
 jobs:
   linux:

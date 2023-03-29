@@ -1,16 +1,15 @@
-name: Build on Windows with vcpkg
+name: Build on Windows
 on:
   push:
-    paths-ignore:
-      - .github/workflows/build_conda.yaml
-      - .github/workflows/build_linux.yaml
-      - .github/workflows/build_macos_homebrew.yaml
-      - .github/workflows/wheels.yaml
-      - README.md
-      - .gitignore
+    paths:
+      - '!.github/workflows/*'
+      - .github/workflows/build_windows.yaml
+      - setup.py
+      - src/*
+      - tests/*
 
 jobs:
-  build:
+  vcpkg:
     runs-on: windows-latest
     steps:
       - name: Checkout
