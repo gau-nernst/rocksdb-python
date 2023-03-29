@@ -9,14 +9,11 @@ on:
       - tests/*
 
 jobs:
-  build:
+  ubuntu:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
-      - name: Install RocksDB dependencies
-        run: sudo apt-get -y install libsnappy-dev zlib1g-dev libbz2-dev liblz4-dev libzstd-dev
 
       - name: Checkout RocksDB
         uses: actions/checkout@v3
@@ -25,14 +22,15 @@ jobs:
           ref: v8.0.0
           path: rocksdb
 
+      - name: Install RocksDB dependencies
+        run: sudo apt-get -y install libsnappy-dev zlib1g-dev libbz2-dev liblz4-dev libzstd-dev
+
       - name: Build RocksDB
-        run: |
-          make -C rocksdb static_lib -j $(nproc)
-          strip --strip-debug --strip-unneeded rocksdb/librocksdb.a
+        run: make -C rocksdb static_lib -j $(nproc)
         env:
           PORTABLE: 1
-          EXTRA_CFLAGS: -fPIC
-          EXTRA_CXXFLAGS: -fPIC
+          EXTRA_CFLAGS: -fPIC -g0
+          EXTRA_CXXFLAGS: -fPIC -g0
 
       - name: Setup Python
         uses: actions/setup-python@v3
