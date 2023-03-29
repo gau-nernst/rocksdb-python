@@ -123,7 +123,7 @@ jobs:
           cd zlib/build
           cmake ${{ env.CMAKE_FLAGS }} ../
           msbuild zlib.sln ${{ env.MSBUILD_FLAGS }}
-          cp Release/zlibstatic.lib ../z.lib
+          cp Release/zlibstatic.lib ../../z.lib
 
       - name: Build Snappy
         run: |
@@ -132,7 +132,7 @@ jobs:
           cd snappy/build
           cmake ${{ env.CMAKE_FLAGS }} -DSNAPPY_BUILD_TESTS=0 -DSNAPPY_REQUIRE_AVX2=1 ../
           msbuild Snappy.sln ${{ env.MSBUILD_FLAGS }}
-          cp Release/*.lib ..
+          cp Release/*.lib ../..
 
       - name: Build LZ4
         run: |
@@ -140,7 +140,7 @@ jobs:
           cd lz4/build
           cmake ${{ env.CMAKE_FLAGS }} -DLZ4_BUILD_CLI=0 -DLZ4_BUILD_LEGACY_LZ4C=0 -DLZ4_BUNDLED_MODE=1 ./cmake
           msbuild LZ4.sln ${{ env.MSBUILD_FLAGS }}
-          cp Release/*.lib ..
+          cp Release/*.lib ../..
 
       - name: Build Zstd
         run: |
@@ -148,7 +148,7 @@ jobs:
           cd zstd/build
           cmake ${{ env.CMAKE_FLAGS }} -DZSTD_LEGACY_SUPPORT=0 -DZSTD_BUILD_PROGRAMS=0 -DZSTD_BUILD_TESTS=0 -DZSTD_BUILD_SHARED=0 ./cmake
           msbuild zstd.sln ${{ env.MSBUILD_FLAGS }}
-          cp lib/Release/zstd_static.lib ../zstd.lib
+          cp lib/Release/zstd_static.lib ../../zstd.lib
 
       - name: Build rocksdb
         run: |
