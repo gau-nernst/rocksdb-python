@@ -33,7 +33,11 @@ jobs:
           export CPATH=$CPATH:$(ls -d snappy-*/):$(ls -d snappy-*/build/)
           export CPATH=$CPATH:$(ls -d lz4-*/lib/)
           export CPATH=$CPATH:$(ls -d zstd-*/lib/):$(ls -d zstd-*/lib/dictBuilder/)
-          PORTABLE=1 EXTRA_CFLAGS=-fPIC EXTRA_CXXFLAGS=-fPIC make static_lib -j $(nproc)
+          make static_lib -j $(nproc)
+        env:
+          PORTABLE: 1
+          EXTRA_CFLAGS: -fPIC -g0
+          EXTRA_CXXFLAGS: -fPIC -g0
 
       - name: Upload built libs
         uses: actions/upload-artifact@v3
@@ -60,18 +64,17 @@ jobs:
 
       - name: Build RocksDB
         run: |
-          make libsnappy.a liblz4.a libzstd.a -j $(sysctl -n hw.ncpu)
+          make rocksdbjavastatic_deps -j $(sysctl -n hw.ncpu)
+          rm libz.a libbz2.a
           export CPATH=$CPATH:$(ls -d snappy-*/):$(ls -d snappy-*/build/)
           export CPATH=$CPATH:$(ls -d lz4-*/lib/)
           export CPATH=$CPATH:$(ls -d zstd-*/lib/):$(ls -d zstd-*/lib/dictBuilder/)
           make static_lib -j $(sysctl -n hw.ncpu)
         env:
-          DEBUG_LEVEL: 0
-          LIB_MODE: static
           ARCHFLAG: -arch ${{ matrix.arch }}
           PORTABLE: 1
-          EXTRA_CFLAGS: -fPIC
-          EXTRA_CXXFLAGS: -fPIC
+          EXTRA_CFLAGS: -fPIC -g0
+          EXTRA_CXXFLAGS: -fPIC -g0
 
       - name: Upload built libs
         uses: actions/upload-artifact@v3
