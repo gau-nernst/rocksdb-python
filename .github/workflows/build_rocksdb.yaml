@@ -20,6 +20,8 @@ jobs:
       fail-fast: false
       matrix:
         tag: [manylinux2014_x86_64, musllinux_1_1_x86_64]
+    env:
+      ARTIFACT_NAME: rocksdb_${{ matrix.tag }}
     steps:
       - name: Checkout RocksDB
         uses: actions/checkout@v3
@@ -36,20 +38,22 @@ jobs:
           export CPATH=$CPATH:$(ls -d lz4-*/lib/)
           export CPATH=$CPATH:$(ls -d zstd-*/lib/):$(ls -d zstd-*/lib/dictBuilder/)
           make static_lib -j $(nproc)
-          mkdir lib
-          mv *.a lib/
         env:
           PORTABLE: 1
           EXTRA_CFLAGS: -fPIC -g0
           EXTRA_CXXFLAGS: -fPIC -g0
 
+      - name: Package
+        run: |
+          mkdir lib
+          mv *.a lib/
+          tar -czvf ${{ env.ARTIFACT_NAME }}.tar.gz include/ lib/
+
       - name: Upload built libs
         uses: actions/upload-artifact@v3
         with:
-          name: rocksdb_${{ matrix.tag }}
-          path: |
-            include/
-            lib/
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.ARTIFACT_NAME }}.tar.gz
 
   macos:
     runs-on: macos-latest
@@ -61,6 +65,7 @@ jobs:
       CC: clang
       CXX: clang++
       MACOSX_DEPLOYMENT_TARGET: "10.13"  # min required by RocksDB
+      ARTIFACT_NAME: rocksdb_macos_${{ matrix.arch }}
     steps:
       - name: Checkout RocksDB
         uses: actions/checkout@v3
@@ -76,21 +81,23 @@ jobs:
           export CPATH=$CPATH:$(ls -d lz4-*/lib/)
           export CPATH=$CPATH:$(ls -d zstd-*/lib/):$(ls -d zstd-*/lib/dictBuilder/)
           make static_lib -j $(sysctl -n hw.ncpu)
-          mkdir lib
-          mv *.a lib/
         env:
           ARCHFLAG: -arch ${{ matrix.arch }}
           PORTABLE: 1
           EXTRA_CFLAGS: -fPIC -g0
           EXTRA_CXXFLAGS: -fPIC -g0
 
+      - name: Package
+        run: |
+          mkdir lib
+          mv *.a lib/
+          tar -czvf ${{ env.ARTIFACT_NAME }}.tar.gz include/ lib/
+
       - name: Upload built libs
         uses: actions/upload-artifact@v3
         with:
-          name: rocksdb_macos_${{ matrix.arch }}
-          path: |
-            include/
-            lib/
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.ARTIFACT_NAME }}.tar.gz
 
   windows:
     runs-on: windows-latest
@@ -101,6 +108,7 @@ jobs:
     env:
       CMAKE_FLAGS: -G "Visual Studio 17 2022" -A ${{ matrix.arch }} -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=0
       MSBUILD_FLAGS: /m /p:Configuration=Release
+      ARTIFACT_NAME: rocksdb_windows_${{ matrix.arch }}
 
       ZLIB_VERSION: v1.2.13
       SNAPPY_VERSION: '1.1.8'
@@ -158,18 +166,20 @@ jobs:
             -DROCKSDB_BUILD_SHARED=0 -DWITH_BENCHMARK_TOOLS=0 -DWITH_TRACE_TOOLS=0 -DWITH_CORE_TOOLS=0 -DWITH_TOOLS=0 ../
           msbuild rocksdb.sln ${{ env.MSBUILD_FLAGS }}
           cp Release/*.lib ..
-          mkdir ../lib
-          mv ../*.lib ../lib/
         env:
           ZLIB_INCLUDE: zlib;zlib/build
           SNAPPY_INCLUDE: snappy;snappy/build
           LZ4_INCLUDE: lz4/lib
           ZSTD_INCLUDE: zstd/lib;zstd/lib/dictBuilder
 
+      - name: Package
+        run: |
+          mkdir lib
+          mv *.lib lib/
+          tar -czvf ${{ env.ARTIFACT_NAME }}.tar.gz include/ lib/
+
       - name: Upload built libs
         uses: actions/upload-artifact@v3
         with:
-          name: rocksdb_windows_${{ matrix.arch }}
-          path: |
-            include/
-            lib/
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.ARTIFACT_NAME }}.tar.gz
