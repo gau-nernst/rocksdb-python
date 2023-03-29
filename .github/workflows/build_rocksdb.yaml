@@ -46,8 +46,8 @@ jobs:
       - name: Package
         run: |
           mkdir lib
-          mv *.a lib/
-          tar -czvf ${{ env.ARTIFACT_NAME }}.tar.gz include/ lib/
+          mv *.a lib
+          tar -czvf ${{ env.ARTIFACT_NAME }}.tar.gz include lib
 
       - name: Upload built libs
         uses: actions/upload-artifact@v3
@@ -90,8 +90,8 @@ jobs:
       - name: Package
         run: |
           mkdir lib
-          mv *.a lib/
-          tar -czvf ${{ env.ARTIFACT_NAME }}.tar.gz include/ lib/
+          mv *.a lib
+          tar -czvf ${{ env.ARTIFACT_NAME }}.tar.gz include lib
 
       - name: Upload built libs
         uses: actions/upload-artifact@v3
@@ -175,8 +175,8 @@ jobs:
       - name: Package
         run: |
           mkdir lib
-          mv *.lib lib/
-          tar -czvf ${{ env.ARTIFACT_NAME }}.tar.gz include/ lib/
+          mv *.lib lib
+          tar -czvf ${{ env.ARTIFACT_NAME }}.tar.gz include lib
 
       - name: Upload built libs
         uses: actions/upload-artifact@v3
