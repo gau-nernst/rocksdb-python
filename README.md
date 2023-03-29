@@ -23,15 +23,11 @@ TBD
 ```bash
 # on Linux and MacOS
 conda install rocksdb -c conda-forge
-git clone https://github.com/gau-nernst/rocksdb-python
-cd rocksdb-python
-pip install .
+pip install git+https://github.com/gau-nernst/rocksdb-python.git
 
 # on Windows
 conda install rocksdb zlib -c conda-forge
-git clone https://github.com/gau-nernst/rocksdb-python
-cd rocksdb-python
-LZ4_LIB=liblz4 BZ2_LIB=libbz2 pip install .
+LZ4_LIB=liblz4 BZ2_LIB=libbz2 pip install git+https://github.com/gau-nernst/rocksdb-python.git
 ```
 
 ### With Homebrew (MacOS only)
@@ -40,10 +36,7 @@ LZ4_LIB=liblz4 BZ2_LIB=libbz2 pip install .
 
 ```bash
 brew install rocksdb
-
-git clone https://github.com/gau-nernst/rocksdb-python
-cd rocksdb-python
-pip install .
+pip install git+https://github.com/gau-nernst/rocksdb-python.git
 ```
 
 ### Build RocksDB from source
@@ -62,7 +55,7 @@ brew install snappy lz4 zstd  # zlib and bzip2 come with MacOS
 git clone https://github.com/gau-nernst/rocksdb-python
 cd rocksdb-python
 git clone https://github.com/facebook/rocksdb --branch v8.0.0
-PORTABLE=1 EXTRA_CFLAGS=-fPIC EXTRA_CXXFLAGS=-fPIC make -C rocksdb static_lib -j $(nproc)
+PORTABLE=1 EXTRA_CFLAGS=-fPIC EXTRA_CXXFLAGS=-fPIC make -C rocksdb static_lib -j4
 pip install .
 ```
 
@@ -70,10 +63,7 @@ On Windows, you can install RocksDB and its dependencies with vcpkg. Make sure t
 
 ```bash
 vcpkg install rocksdb[core,bzip2,lz4,snappy,zlib,zstd]:x64-windows-static-md
-
-git clone https://github.com/gau-nernst/rocksdb-python
-cd rocksdb-python
-ZLIB_LIB=zlib pip install .
+ZLIB_LIB=zlib pip install git+https://github.com/gau-nernst/rocksdb-python.git
 ```
 
 ### Other notes

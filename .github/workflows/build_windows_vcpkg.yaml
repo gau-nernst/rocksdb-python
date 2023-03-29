@@ -16,9 +16,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1.1
-
       - name: Build RocksDB from vcpkg
         run: vcpkg install rocksdb[core,bzip2,lz4,snappy,zlib,zstd]:x64-windows-static-md
 

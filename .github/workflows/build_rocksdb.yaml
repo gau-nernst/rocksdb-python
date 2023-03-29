@@ -38,7 +38,7 @@ jobs:
       - name: Upload built libs
         uses: actions/upload-artifact@v3
         with:
-          name: build/${{ matrix.tag }}
+          name: rocksdb_${{ matrix.tag }}
           path: lib*.a
 
   macos:
@@ -76,7 +76,7 @@ jobs:
       - name: Upload built libs
         uses: actions/upload-artifact@v3
         with:
-          name: build/macos_${{ matrix.arch }}
+          name: rocksdb_macos_${{ matrix.arch }}
           path: lib*.a
 
   windows:
@@ -84,20 +84,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [x64, x86, arm64]
+        include:
+          - tag: win_amd64
+            triplet: x64
+          - tag: win32
+            triplet: x86
+          - tag: win_arm64
+            triplet: arm64
     steps:
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1.1
-
       - name: Build RocksDB from vcpkg
-        run: |
-          vcpkg install rocksdb[core,bzip2,lz4,snappy,zlib,zstd]:${{ matrix.arch }}-windows-static-md
+        run: vcpkg install rocksdb[core,bzip2,lz4,snappy,zlib,zstd]:${{ matrix.triplet }}-windows-static-md
 
       - name: Upload built libs
         uses: actions/upload-artifact@v3
         with:
-          name: build/win_${{ matrix.arch }}
-          path: C:\vcpkg\installed\${{ matrix.arch }}-windows-static-md
+          name: rocksdb_${{ matrix.tag }}
+          path: C:\vcpkg\installed\${{ matrix.triplet }}-windows-static-md
 
   # publish_wheels:
   #   name: Publish wheels
