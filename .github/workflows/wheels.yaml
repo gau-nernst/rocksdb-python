@@ -125,12 +125,14 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1.1
 
-      - name: Build RocksDB from vcpkg
-        run: vcpkg install rocksdb[core,bzip2,lz4,snappy,zlib,zstd]:${{ matrix.vcpkg-triplet }}
+      # - name: Build RocksDB from vcpkg
+      #   run: vcpkg install rocksdb[core,bzip2,lz4,snappy,zlib,zstd]:${{ matrix.vcpkg-triplet }}
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.12.1
         env:
+          CIBW_BEFORE_BUILD: where cl
+
           CIBW_ENVIRONMENT_WINDOWS: ZLIB_LIB=zlib
           CIBW_BUILD_VERBOSITY: 1
           CIBW_BUILD: cp3{7..11}-*
