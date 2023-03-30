@@ -40,7 +40,7 @@ def add_path(path, include="include", lib="lib"):
         library_dirs.append(str(lib_path))
 
 
-add_path(CURRENT_DIR / "rocksdb", lib="")
+add_path(CURRENT_DIR)
 
 if IS_MACOS and subprocess.run(["which", "brew"]).returncode == 0:
     proc = subprocess.run(["brew", "--prefix"], check=True, capture_output=True)
