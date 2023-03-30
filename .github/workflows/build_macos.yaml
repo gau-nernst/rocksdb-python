@@ -35,7 +35,7 @@ jobs:
         run: pytest tests/
 
   pre-built:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -55,9 +55,6 @@ jobs:
 
       - name: Build
         run: pip install . -v
-        env:
-          CC: clang
-          CXX: clang++
 
       - name: Test
         run: pytest tests/
