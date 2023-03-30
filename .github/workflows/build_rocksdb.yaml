@@ -2,11 +2,7 @@ name: Build RocksDB
 on:
   push:
     paths:
-      - '!.github/workflows/*'
       - .github/workflows/build_rocksdb.yaml
-      - setup.py
-      - src/*
-      - tests/*
 
 env:
   ROCKSDB_VERSION: '8.0.0'
