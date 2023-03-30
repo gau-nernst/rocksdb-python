@@ -46,7 +46,7 @@ jobs:
           CIBW_ENVIRONMENT_MACOS: 'MACOSX_DEPLOYMENT_TARGET=10.13 CC=clang CXX=clang++'  # min required by RocksDB
 
           CIBW_BUILD_VERBOSITY: 1
-          CIBW_BUILD: cp3{7..11}-${{ matrix.tag }}
+          CIBW_BUILD: cp3{8..11}-${{ matrix.tag }}
           CIBW_ARCHS: all
 
           CIBW_TEST_REQUIRES: pytest
