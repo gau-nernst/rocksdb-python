@@ -9,7 +9,7 @@ on:
       - tests/*
 
 jobs:
-  ubuntu:
+  build:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
