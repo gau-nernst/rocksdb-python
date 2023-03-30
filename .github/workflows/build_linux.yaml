@@ -25,6 +25,8 @@ jobs:
         run: |
           gh release download rocksdb-8.0.0 -p '*manylinux2014_x86_64.tar.gz' -O rocksdb.tar.gz
           tar -xzvf rocksdb.tar.gz
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Build
         run: pip install . -v
