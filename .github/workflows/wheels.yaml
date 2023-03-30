@@ -3,7 +3,7 @@ on:
   push:
     paths:
       - '!.github/workflows/*'
-      - .github/workflows/build_wheels.yaml
+      - .github/workflows/wheels.yaml
       - setup.py
       - src/*
       - tests/*
