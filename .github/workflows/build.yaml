@@ -18,9 +18,9 @@ jobs:
           - os: ubuntu-latest
             tag: manylinux2014_x86_64
           - os: macos-latest
-            tag: macos_x86_64
+            tag: macosx_x86_64
           - os: windows-latest
-            tag: windows_x64
+            tag: win_amd64
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -41,7 +41,7 @@ jobs:
       - name: Build
         run: pip install . -v
         env:
-          CFLAGS: '-D_GLIBCXX_USE_CXX11_ABI=0'
+          CFLAGS: '-D_GLIBCXX_USE_CXX11_ABI=0'  # because RocksDB is built on manylinux2014
 
       - name: Test
         run: pytest tests/

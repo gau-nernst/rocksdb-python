@@ -9,128 +9,45 @@ on:
       - tests/*
 
 jobs:
-  linux:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: [manylinux, musllinux]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Checkout RocksDB
-        uses: actions/checkout@v3
-        with:
-          repository: facebook/rocksdb
-          ref: v8.0.0
-          path: rocksdb
-
-      - name: Build wheels
-        uses: pypa/cibuildwheel@v2.12.1
-        env:
-          CIBW_BEFORE_ALL_LINUX: >
-            cd {project}/rocksdb &&
-            make rocksdbjavastatic_deps -j2 &&
-            export CPATH=$CPATH:$(ls -d zlib-*/) &&
-            export CPATH=$CPATH:$(ls -d bzip2-*/) &&
-            export CPATH=$CPATH:$(ls -d snappy-*/):$(ls -d snappy-*/build/) &&
-            export CPATH=$CPATH:$(ls -d lz4-*/lib/) &&
-            export CPATH=$CPATH:$(ls -d zstd-*/lib/):$(ls -d zstd-*/lib/dictBuilder/) &&
-            PORTABLE=1 EXTRA_CFLAGS=-fPIC EXTRA_CXXFLAGS=-fPIC make static_lib -j2
-
-          CIBW_BUILD_VERBOSITY: 1
-          CIBW_BUILD: cp3{7..11}-${{ matrix.platform }}_*
-          CIBW_ARCHS_LINUX: x86_64
-
-          CIBW_TEST_REQUIRES: pytest
-          CIBW_TEST_COMMAND: pytest -v {project}/tests
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: wheels
-          path: ./wheelhouse/*.whl
-
-  macos:
-    runs-on: macos-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        arch: [x86_64, arm64]
-    env:
-      CC: clang
-      CXX: clang++
-      MACOSX_DEPLOYMENT_TARGET: "10.13"  # min required by RocksDB
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Checkout RocksDB
-        uses: actions/checkout@v3
-        with:
-          repository: facebook/rocksdb
-          ref: v8.0.0
-          path: rocksdb
-
-      - name: Compile RocksDB
-        run: |
-          cd rocksdb
-          make libsnappy.a liblz4.a libzstd.a -j $(sysctl -n hw.ncpu)
-          export CPATH=$CPATH:$(ls -d snappy-*/):$(ls -d snappy-*/build/)
-          export CPATH=$CPATH:$(ls -d lz4-*/lib/)
-          export CPATH=$CPATH:$(ls -d zstd-*/lib/):$(ls -d zstd-*/lib/dictBuilder/)
-          make static_lib -j $(sysctl -n hw.ncpu)
-        env:
-          DEBUG_LEVEL: 0
-          LIB_MODE: static
-          ARCHFLAG: -arch ${{ matrix.arch }}
-          PORTABLE: 1
-          EXTRA_CFLAGS: -fPIC
-          EXTRA_CXXFLAGS: -fPIC
-
-      - name: Build wheels
-        uses: pypa/cibuildwheel@v2.12.1
-        env:
-          CIBW_BUILD_VERBOSITY: 1
-          CIBW_BUILD: cp3{7..11}-*
-          CIBW_ARCHS_MACOS: ${{ matrix.arch }}
-
-          CIBW_TEST_REQUIRES: pytest
-          CIBW_TEST_COMMAND: pytest -v {project}/tests
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: wheels
-          path: ./wheelhouse/*.whl
-
-  windows:
-    runs-on: windows-latest
+  wheels:
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         include:
-          - vcpkg-triplet: x64-windows-static-md
-            cibw-arch: AMD64
-          - vcpkg-triplet: x86-windows-static-md
-            cibw-arch: x86
-          - vcpkg-triplet: arm64-windows-static-md
-            cibw-arch: ARM64
+          - os: ubuntu-latest
+            tag: manylinux_x86_64
+          - os: ubuntu-latest
+            tag: musllinux_x86_64
+
+          - os: macos-latest
+            tag: macosx_x86_64
+          - os: macos-latest
+            tag: macosx_arm64
+
+          - os: windows-latest
+            tag: windows_amd64
+          - os: windows-latest
+            tag: windows_arm64
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Build RocksDB from vcpkg
-        run: vcpkg install rocksdb[core,bzip2,lz4,snappy,zlib,zstd]:${{ matrix.vcpkg-triplet }}
+      - name: Download RocksDB
+        run: |
+          gh release download rocksdb-8.0.0 -p '*${{ matrix.tag }}.tar.gz' -O rocksdb.tar.gz
+          tar -xzvf rocksdb.tar.gz
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.12.1
         env:
-          CIBW_ENVIRONMENT_WINDOWS: ZLIB_LIB=zlib
+          CIBW_ENVIRONMENT_MACOS: 'MACOSX_DEPLOYMENT_TARGET=10.13'  # min required by RocksDB
+
           CIBW_BUILD_VERBOSITY: 1
-          CIBW_BUILD: cp3{7..11}-*
-          CIBW_ARCHS_WINDOWS: ${{ matrix.cibw-arch }}
+          CIBW_BUILD: cp3{7..11}-${{ matrix.tag }}
+          CIBW_ARCHS: all
 
           CIBW_TEST_REQUIRES: pytest
           CIBW_TEST_COMMAND: pytest -v {project}/tests
