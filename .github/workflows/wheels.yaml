@@ -1,0 +1,79 @@
+name: Build wheels
+on:
+  push:
+    paths:
+      - '!.github/workflows/*'
+      - .github/workflows/wheels.yaml
+      - setup.py
+      - src/*
+      - tests/*
+
+jobs:
+  wheels:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            tag: manylinux_x86_64
+          - os: ubuntu-latest
+            tag: musllinux_x86_64
+
+          - os: macos-latest
+            tag: macosx_x86_64
+          - os: macos-latest
+            tag: macosx_arm64
+
+          - os: windows-latest
+            tag: win_amd64
+          - os: windows-latest
+            tag: win_arm64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Download RocksDB
+        run: |
+          gh release download rocksdb-8.0.0 -p '*${{ matrix.tag }}.tar.gz' -O rocksdb.tar.gz
+          tar -xzvf rocksdb.tar.gz
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.12.1
+        env:
+          CIBW_ENVIRONMENT_MACOS: 'MACOSX_DEPLOYMENT_TARGET=10.13 CC=clang CXX=clang++'  # min required by RocksDB
+
+          CIBW_BUILD_VERBOSITY: 1
+          CIBW_BUILD: cp3{8..11}-${{ matrix.tag }}
+          CIBW_ARCHS: all
+
+          CIBW_TEST_REQUIRES: pytest
+          CIBW_TEST_COMMAND: pytest -v {project}/tests
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: wheels
+          path: ./wheelhouse/*.whl
+
+  # publish_wheels:
+  #   name: Publish wheels
+  #   if: github.event.inputs.make_release == 'true'
+  #   needs: build_wheels
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
+  #       with:
+  #         submodules: recursive
+  #     - name: Download artifacts
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: wheels
+  #         path: wheelhouse
+  #     - name: Create release
+  #       run: gh release create ${{ github.event.inputs.tag }} ./wheelhouse/*.whl --generate-notes
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

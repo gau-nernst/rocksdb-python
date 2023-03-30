@@ -1,8 +1,7 @@
 # RocksDB Python
 
-[![Build](https://github.com/gau-nernst/rocksdb-python/actions/workflows/build.yaml/badge.svg)](https://github.com/gau-nernst/rocksdb-python/actions/workflows/build.yaml)
-
 [![Build with conda](https://github.com/gau-nernst/rocksdb-python/actions/workflows/build_conda.yaml/badge.svg)](https://github.com/gau-nernst/rocksdb-python/actions/workflows/build_conda.yaml)
+[![Build and Test](https://github.com/gau-nernst/rocksdb-python/actions/workflows/build.yaml/badge.svg)](https://github.com/gau-nernst/rocksdb-python/actions/workflows/build.yaml)
 
 Cross-platform Python bindings for [RocksDB](https://github.com/facebook/rocksdb). Other RocksDB Python bindings libraries usually don't provide Windows builds. This repo aims to target all OSes, including Windows.
 
@@ -23,15 +22,11 @@ TBD
 ```bash
 # on Linux and MacOS
 conda install rocksdb -c conda-forge
-git clone https://github.com/gau-nernst/rocksdb-python
-cd rocksdb-python
-pip install .
+pip install git+https://github.com/gau-nernst/rocksdb-python.git
 
 # on Windows
 conda install rocksdb zlib -c conda-forge
-git clone https://github.com/gau-nernst/rocksdb-python
-cd rocksdb-python
-LZ4_LIB=liblz4 BZ2_LIB=libbz2 pip install .
+LZ4_LIB=liblz4 BZ2_LIB=libbz2 pip install git+https://github.com/gau-nernst/rocksdb-python.git
 ```
 
 ### With Homebrew (MacOS only)
@@ -40,10 +35,7 @@ LZ4_LIB=liblz4 BZ2_LIB=libbz2 pip install .
 
 ```bash
 brew install rocksdb
-
-git clone https://github.com/gau-nernst/rocksdb-python
-cd rocksdb-python
-pip install .
+pip install git+https://github.com/gau-nernst/rocksdb-python.git
 ```
 
 ### Build RocksDB from source
@@ -62,26 +54,20 @@ brew install snappy lz4 zstd  # zlib and bzip2 come with MacOS
 git clone https://github.com/gau-nernst/rocksdb-python
 cd rocksdb-python
 git clone https://github.com/facebook/rocksdb --branch v8.0.0
-PORTABLE=1 EXTRA_CFLAGS=-fPIC EXTRA_CXXFLAGS=-fPIC make -C rocksdb static_lib -j $(nproc)
+PORTABLE=1 EXTRA_CFLAGS=-fPIC EXTRA_CXXFLAGS=-fPIC make -C rocksdb static_lib -j4
+cp rocksdb/include .
+cp rocksdb/librocksdb.a .
 pip install .
 ```
 
-On Windows, you can install RocksDB and its dependencies with vcpkg. Make sure to use triplet `x64-windows-static-md`.
-
-```bash
-vcpkg install rocksdb[core,bzip2,lz4,snappy,zlib,zstd]:x64-windows-static-md
-
-git clone https://github.com/gau-nernst/rocksdb-python
-cd rocksdb-python
-ZLIB_LIB=zlib pip install .
-```
+Building RocksDB on Windows is complicated. vcpkg can help you, but it doesn't allow building Release target from CLI. You can refer to my automated GHA workflow at [.github/workflows/build_rocksdb.yaml](.github/workflows/build_rocksdb.yaml) to see how to build RocksDB (and its dependencies) with CMake.
 
 ### Other notes
 
-`setup.py` assumes RocksDB was compiled with all dependencies enabled i.e. snappy, lz4, zlib, zstd, bz2. It will also try to add header and library paths for linking:
+`setup.py` assumes RocksDB was compiled with all dependencies enabled i.e. snappy, lz4, zlib, zstd, bz2. It will also try to add header paths for compilation and library paths for linking:
 
 - On all platforms: `./rocksdb` for source build; `$CONDA_PREFIX$` for conda libs (automatically added by conda)
-- On Windows: `$CONDA_PREFIX$/Library/` for conda libs, `VCPKG_ROOT/installed/x64-windows-static-md` for vcpkg libs
+- On Windows: `$CONDA_PREFIX$/Library/` for conda libs
 - On MacOS: `$(brew --prefix)` for Homebrew libs
 
 On Windows, RocksDB's dependencies library files may have different names depending on how you build them. To link them correctly, specify their names via environment variables.
@@ -92,7 +78,11 @@ e.g. with RocksDB installed from conda-forge
 LZ4_LIB=liblz4 BZ2_LIB=libbz2 pip install .
 ```
 
-# Basic usage
+## My RocksDB build
+
+I write my own GHA workflow [.github/workflows/build_rocksdb.yaml](.github/workflows/build_rocksdb.yaml) to build RocksDB and its dependencies from source. See the Release section for more info.
+
+## Basic usage
 
 ```python
 from rocksdb_python import Options, PyDB, ReadOptions, WriteOptions

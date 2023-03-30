@@ -4,7 +4,7 @@ import subprocess
 from glob import glob
 from pathlib import Path
 
-from pybind11.setup_helpers import Pybind11Extension
+from pybind11.setup_helpers import ParallelCompile, Pybind11Extension, naive_recompile
 from setuptools import setup
 
 
@@ -12,17 +12,19 @@ __version__ = "0.0.1"
 
 CURRENT_DIR = Path(__file__).parent
 
-CONDA_PREFIX = Path(os.environ["CONDA_PREFIX"]) if "CONDA_PREFIX" in os.environ else None
-
 IS_LINUX = platform.system() == "Linux"
 IS_MACOS = platform.system() == "Darwin"
 IS_WIN = platform.system() == "Windows"
 
-SNAPPY_LIB = os.environ.get("SNAPPY_LIB", "snappy")
-LZ4_LIB = os.environ.get("LZ4_LIB", "lz4")
-ZLIB_LIB = os.environ.get("ZLIB_LIB", "z")
-ZSTD_LIB = os.environ.get("ZSTD_LIB", "zstd")
-BZ2_LIB = os.environ.get("BZ2_LIB", "bz2")
+_default_lib_names = dict(
+    rocksdb="rocksdb",
+    snappy="snappy",
+    lz4="lz4",
+    zlib="z",
+    zstd="zstd",
+    bz2="bz2",
+)
+lib_names = {k: os.environ.get(k.upper() + "_LIB", v) for k, v in _default_lib_names.items()}
 
 include_dirs = []
 library_dirs = []
@@ -38,27 +40,18 @@ def add_path(path, include="include", lib="lib"):
         library_dirs.append(str(lib_path))
 
 
-add_path(CURRENT_DIR / "rocksdb", lib="")
+add_path(CURRENT_DIR)
 
-if IS_MACOS:
-    try:
-        proc = subprocess.run(["brew", "--prefix"], check=True, capture_output=True)
-        HOMEBREW_PREFIX = Path(proc.stdout.decode().strip())
-        add_path(HOMEBREW_PREFIX)
-    except FileNotFoundError:  # brew is not installed
-        pass
+if IS_MACOS and subprocess.run(["which", "brew"]).returncode == 0:
+    proc = subprocess.run(["brew", "--prefix"], check=True, capture_output=True)
+    HOMEBREW_PREFIX = Path(proc.stdout.decode().strip())
+    add_path(HOMEBREW_PREFIX)
 
-if IS_WIN:
-    if CONDA_PREFIX is not None:
-        add_path(CONDA_PREFIX / "Library")
-
-    proc = subprocess.run(["where", "vcpkg"], capture_output=True)
-    if proc.returncode == 0:
-        VCPKG_PREFIX = Path(proc.stdout.decode().strip()).parent
-        add_path(VCPKG_PREFIX / "installed" / "x64-windows-static-md")
+if IS_WIN and "CONDA_PREFIX" in os.environ:
+    add_path(Path(os.environ["CONDA_PREFIX"]) / "Library")
 
 
-libraries = ["rocksdb", SNAPPY_LIB, LZ4_LIB, ZLIB_LIB, ZSTD_LIB, BZ2_LIB]
+libraries = [lib for lib in lib_names.values() if lib]
 if IS_WIN:
     libraries.extend(["Rpcrt4", "Shlwapi"])  # for port_win.cc
     libraries.append("Cabinet")  # for XPRESS
@@ -74,6 +67,7 @@ ext = Pybind11Extension(
     cxx_std=17,
 )
 
+ParallelCompile("NPY_NUM_BUILD_JOBS", needs_recompile=naive_recompile).install()
 setup(
     name="rocksdb-python",
     version=__version__,
