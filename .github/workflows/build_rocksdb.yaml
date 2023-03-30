@@ -128,8 +128,7 @@ jobs:
       - name: Build ZLib
         run: |
           git clone https://github.com/madler/zlib --branch=${{ env.ZLIB_VERSION }}
-          mkdir zlib/build
-          cd zlib/build
+          mkdir zlib/build && cd zlib/build
           cmake ${{ env.CMAKE_FLAGS }} ../
           msbuild zlib.sln ${{ env.MSBUILD_FLAGS }}
           cp Release/zlibstatic.lib ../../z.lib
@@ -138,11 +137,15 @@ jobs:
         run: |
           git clone https://gitlab.com/bzip2/bzip2 --branch=bzip2-${{ env.BZIP2_VERSION }}
           cd bzip2
-          ${{ env.MSVC_PREFIX }}\CL.exe /c blocksort.c huffman.c crctable.c randtable.c compress.c decompress.c bzlib.c
-          ${{ env.MSVC_PREFIX }}\Lib.exe  /OUT:bz2.lib *.obj
-
-        env:
-          MSVC_PREFIX: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.34.31933\bin\HostX64\${{ matrix.arch }}
+          echo "cmake_minimum_required(VERSION 3.10)\n" > CMakeLists.txt
+          echo "project(bzip2)\n" >> CMakeLists.txt
+          echo "include_directories(${PROJECT_BINARY_DIR})\n" >> CMakeLists.txt
+          echo "add_library(bz2 blocksort.c huffman.c crctable.c randtable.c compress.c decompress.c bzlib.c)\n" >> CMakeLists.txt
+          echo "install(TARGETS bz2 DESTINATION lib)\n" >> CMakeLists.txt
+          mkdir build && cd build
+          cmake ${{ env.CMAKE_FLAGS }} ../
+          msbuild bz2.sln ${{ env.MSBUILD_FLAGS }}
+          cp Release/*.lib ../..
 
       - name: Build Snappy
         run: |
