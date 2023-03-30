@@ -142,6 +142,7 @@ jobs:
           echo "include_directories(${PROJECT_BINARY_DIR})\n" >> CMakeLists.txt
           echo "add_library(bz2 blocksort.c huffman.c crctable.c randtable.c compress.c decompress.c bzlib.c)\n" >> CMakeLists.txt
           echo "install(TARGETS bz2 DESTINATION lib)\n" >> CMakeLists.txt
+          cat CMakeLists.txt
           mkdir build && cd build
           cmake ${{ env.CMAKE_FLAGS }} ../
           msbuild bz2.sln ${{ env.MSBUILD_FLAGS }}
@@ -150,8 +151,7 @@ jobs:
       - name: Build Snappy
         run: |
           git clone https://github.com/google/snappy/ --branch=${{ env.SNAPPY_VERSION }}
-          mkdir snappy/build
-          cd snappy/build
+          mkdir snappy/build && cd snappy/build
           cmake ${{ env.CMAKE_FLAGS }} -DSNAPPY_BUILD_TESTS=0 -DSNAPPY_REQUIRE_AVX2=1 ../
           msbuild Snappy.sln ${{ env.MSBUILD_FLAGS }}
           cp Release/*.lib ../..
@@ -174,8 +174,7 @@ jobs:
 
       - name: Build rocksdb
         run: |
-          mkdir build
-          cd build
+          mkdir build && cd build
           cmake ${{ env.CMAKE_FLAGS }} -DWITH_SNAPPY=1 -DWITH_LZ4=1 -DWITH_ZLIB=1 -DWITH_ZSTD=1 -DXPRESS=1 `
             -DROCKSDB_BUILD_SHARED=0 -DWITH_BENCHMARK_TOOLS=0 -DWITH_TRACE_TOOLS=0 -DWITH_CORE_TOOLS=0 -DWITH_TOOLS=0 ../
           msbuild rocksdb.sln ${{ env.MSBUILD_FLAGS }}
