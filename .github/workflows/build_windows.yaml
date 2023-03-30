@@ -9,7 +9,7 @@ on:
       - tests/*
 
 jobs:
-  vcpkg:
+  pre-built:
     runs-on: windows-latest
     steps:
       - name: Checkout

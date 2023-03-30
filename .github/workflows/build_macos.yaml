@@ -55,6 +55,9 @@ jobs:
 
       - name: Build
         run: pip install . -v
+        env:
+          CC: clang
+          CXX: clang++
 
       - name: Test
         run: pytest tests/
