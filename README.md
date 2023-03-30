@@ -54,6 +54,8 @@ git clone https://github.com/gau-nernst/rocksdb-python
 cd rocksdb-python
 git clone https://github.com/facebook/rocksdb --branch v8.0.0
 PORTABLE=1 EXTRA_CFLAGS=-fPIC EXTRA_CXXFLAGS=-fPIC make -C rocksdb static_lib -j4
+cp rocksdb/include .
+cp rocksdb/librocksdb.a .
 pip install .
 ```
 
