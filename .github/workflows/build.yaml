@@ -1,0 +1,68 @@
+name: Build and Test
+on:
+  push:
+    paths:
+      - '!.github/workflows/*'
+      - .github/workflows/build.yaml
+      - setup.py
+      - src/*
+      - tests/*
+
+jobs:
+  ubuntu:
+    runs-on: ${{ matrix.os }}
+    matrix:
+      include:
+        - os: ubuntu-latest
+          tag: manylinux2014_x86_64
+        - os: macos-latest
+          tag: macos_x86_64
+        - os: windows-latest
+          tag: windows_x64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v3
+
+      - name: Install dependencies
+        run: pip install pytest
+
+      - name: Download RocksDB
+        run: |
+          gh release download rocksdb-8.0.0 -p '*${{ matrix.tag }}.tar.gz' -O rocksdb.tar.gz
+          tar -xzvf rocksdb.tar.gz
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Build
+        run: pip install . -v
+
+      - name: Test
+        run: pytest tests/
+
+  macos_homebrew:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install RocksDB from Homebrew
+        run: brew install rocksdb
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: 1
+          HOMEBREW_NO_INSTALL_CLEANUP: 1
+          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
+
+      - name: Setup Python
+        uses: actions/setup-python@v3
+
+      - name: Install dependencies
+        run: pip install pytest
+
+      - name: Build
+        run: pip install . -v
+
+      - name: Test
+        run: pytest tests/
