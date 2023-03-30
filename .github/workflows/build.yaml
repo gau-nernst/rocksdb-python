@@ -65,6 +65,8 @@ jobs:
 
       - name: Build
         run: pip install . -v
+        env:
+          CFLAGS: '-D_GLIBCXX_USE_CXX11_ABI=0'
 
       - name: Test
         run: pytest tests/
