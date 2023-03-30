@@ -43,7 +43,7 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.12.1
         env:
-          CIBW_ENVIRONMENT_MACOS: 'MACOSX_DEPLOYMENT_TARGET=10.13'  # min required by RocksDB
+          CIBW_ENVIRONMENT_MACOS: 'MACOSX_DEPLOYMENT_TARGET=10.13 CC=clang CXX=clang++'  # min required by RocksDB
 
           CIBW_BUILD_VERBOSITY: 1
           CIBW_BUILD: cp3{7..11}-${{ matrix.tag }}
