@@ -137,11 +137,11 @@ jobs:
         run: |
           git clone https://gitlab.com/bzip2/bzip2 --branch=bzip2-${{ env.BZIP2_VERSION }}
           cd bzip2
-          echo "cmake_minimum_required(VERSION 3.10)\n" > CMakeLists.txt
-          echo "project(bzip2)\n" >> CMakeLists.txt
-          echo "include_directories(${PROJECT_BINARY_DIR})\n" >> CMakeLists.txt
-          echo "add_library(bz2 blocksort.c huffman.c crctable.c randtable.c compress.c decompress.c bzlib.c)\n" >> CMakeLists.txt
-          echo "install(TARGETS bz2 DESTINATION lib)\n" >> CMakeLists.txt
+          echo "cmake_minimum_required(VERSION 3.10)" > CMakeLists.txt
+          echo "project(bzip2)" >> CMakeLists.txt
+          echo "include_directories(${PROJECT_BINARY_DIR})" >> CMakeLists.txt
+          echo "add_library(bz2 blocksort.c huffman.c crctable.c randtable.c compress.c decompress.c bzlib.c)" >> CMakeLists.txt
+          echo "install(TARGETS bz2 DESTINATION lib)" >> CMakeLists.txt
           cat CMakeLists.txt
           mkdir build && cd build
           cmake ${{ env.CMAKE_FLAGS }} ../
