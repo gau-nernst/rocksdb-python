@@ -145,7 +145,7 @@ jobs:
           cat CMakeLists.txt
           mkdir build && cd build
           cmake ${{ env.CMAKE_FLAGS }} ../
-          msbuild bz2.sln ${{ env.MSBUILD_FLAGS }}
+          msbuild bzip2.sln ${{ env.MSBUILD_FLAGS }}
           cp Release/*.lib ../..
 
       - name: Build Snappy
