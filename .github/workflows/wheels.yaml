@@ -26,9 +26,9 @@ jobs:
             tag: macosx_arm64
 
           - os: windows-latest
-            tag: windows_amd64
+            tag: win_amd64
           - os: windows-latest
-            tag: windows_arm64
+            tag: win_arm64
     steps:
       - name: Checkout
         uses: actions/checkout@v3
