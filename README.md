@@ -1,6 +1,7 @@
 # RocksDB Python
 
 [![Build with conda](https://github.com/gau-nernst/rocksdb-python/actions/workflows/build_conda.yaml/badge.svg)](https://github.com/gau-nernst/rocksdb-python/actions/workflows/build_conda.yaml)
+[![Build and Test](https://github.com/gau-nernst/rocksdb-python/actions/workflows/build.yaml/badge.svg)](https://github.com/gau-nernst/rocksdb-python/actions/workflows/build.yaml)
 
 Cross-platform Python bindings for [RocksDB](https://github.com/facebook/rocksdb). Other RocksDB Python bindings libraries usually don't provide Windows builds. This repo aims to target all OSes, including Windows.
 
@@ -79,7 +80,7 @@ LZ4_LIB=liblz4 BZ2_LIB=libbz2 pip install .
 
 ## My RocksDB build
 
-Static library. Also build static deps.
+I write my own GHA workflow [.github/workflows/build_rocksdb.yaml](.github/workflows/build_rocksdb.yaml) to build RocksDB and its dependencies from source. See the Release section for more info.
 
 ## Basic usage
 
