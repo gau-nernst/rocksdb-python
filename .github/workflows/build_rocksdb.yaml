@@ -141,8 +141,6 @@ jobs:
           echo "project(bzip2)" >> CMakeLists.txt
           echo "include_directories(${PROJECT_BINARY_DIR})" >> CMakeLists.txt
           echo "add_library(bz2 blocksort.c huffman.c crctable.c randtable.c compress.c decompress.c bzlib.c)" >> CMakeLists.txt
-          echo "install(TARGETS bz2 DESTINATION lib)" >> CMakeLists.txt
-          cat CMakeLists.txt
           mkdir build && cd build
           cmake ${{ env.CMAKE_FLAGS }} ../
           msbuild bzip2.sln ${{ env.MSBUILD_FLAGS }}
@@ -175,12 +173,13 @@ jobs:
       - name: Build rocksdb
         run: |
           mkdir build && cd build
-          cmake ${{ env.CMAKE_FLAGS }} -DWITH_SNAPPY=1 -DWITH_LZ4=1 -DWITH_ZLIB=1 -DWITH_ZSTD=1 -DXPRESS=1 `
+          cmake ${{ env.CMAKE_FLAGS }} -DWITH_ZLIB=1 -DWITH_BZ2=1 -DWITH_SNAPPY=1 -DWITH_LZ4=1 -DWITH_ZSTD=1 -DXPRESS=1 `
             -DROCKSDB_BUILD_SHARED=0 -DWITH_BENCHMARK_TOOLS=0 -DWITH_TRACE_TOOLS=0 -DWITH_CORE_TOOLS=0 -DWITH_TOOLS=0 ../
           msbuild rocksdb.sln ${{ env.MSBUILD_FLAGS }}
           cp Release/*.lib ..
         env:
           ZLIB_INCLUDE: zlib;zlib/build
+          BZIP2_INCLUDE_DIR: bzip2
           SNAPPY_INCLUDE: snappy;snappy/build
           LZ4_INCLUDE: lz4/lib
           ZSTD_INCLUDE: zstd/lib;zstd/lib/dictBuilder
