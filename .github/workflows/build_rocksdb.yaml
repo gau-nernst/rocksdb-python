@@ -111,6 +111,7 @@ jobs:
       ARTIFACT_NAME: rocksdb_windows_${{ matrix.arch }}
 
       ZLIB_VERSION: v1.2.13
+      BZIP2_VERSION: '1.0.8'
       SNAPPY_VERSION: '1.1.8'
       LZ4_VERSION: v1.9.3
       ZSTD_VERSION: v1.4.9
@@ -132,6 +133,18 @@ jobs:
           cmake ${{ env.CMAKE_FLAGS }} ../
           msbuild zlib.sln ${{ env.MSBUILD_FLAGS }}
           cp Release/zlibstatic.lib ../../z.lib
+
+      - name: Build Bzip2
+        run: |
+          git clone https://gitlab.com/bzip2/bzip2 --branch=bzip2-${{ env.BZIP2_VERSION }}
+          cd bzip2
+          ${{ env.CC }} /c blocksort.c huffman.c crctable.c randtable.c compress.c decompress.c bzlib.c
+          ${{ env.AR }} /OUT:bz2.lib *.obj
+
+        env:
+          MSVC_PREFIX: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.34.31933\bin\HostX64\${{ matrix.arch }}
+          CC: ${{ env.MSVC_PREFIX }}\CL.exe
+          AR: ${{ env.MSVC_PREFIX }}\Lib.exe 
 
       - name: Build Snappy
         run: |
