@@ -11,14 +11,16 @@ on:
 jobs:
   ubuntu:
     runs-on: ${{ matrix.os }}
-    matrix:
-      include:
-        - os: ubuntu-latest
-          tag: manylinux2014_x86_64
-        - os: macos-latest
-          tag: macos_x86_64
-        - os: windows-latest
-          tag: windows_x64
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            tag: manylinux2014_x86_64
+          - os: macos-latest
+            tag: macos_x86_64
+          - os: windows-latest
+            tag: windows_x64
     steps:
       - name: Checkout
         uses: actions/checkout@v3
