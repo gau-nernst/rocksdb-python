@@ -15,19 +15,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Build RocksDB from vcpkg
-        run: vcpkg install rocksdb[core,bzip2,lz4,snappy,zlib,zstd]:x64-windows-static-md
-
       - name: Setup Python
         uses: actions/setup-python@v3
 
       - name: Install dependencies
         run: pip install pytest
 
+      - name: Download RocksDB
+        run: |
+          gh release download rocksdb-8.0.0 -p '*windows_x64.tar.gz' -o rocksdb.tar.gz
+          tar -xzvf rocksdb.tar.gz
+
       - name: Build
         run: pip install . -v
-        env:
-          ZLIB_LIB: zlib
 
       - name: Test
         run: pytest tests/

@@ -33,3 +33,26 @@ jobs:
 
       - name: Test
         run: pytest tests/
+
+  pre-built:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v3
+
+      - name: Install dependencies
+        run: pip install pytest
+
+      - name: Download RocksDB
+        run: |
+          gh release download rocksdb-8.0.0 -p '*macos_x86_64.tar.gz' -o rocksdb.tar.gz
+          tar -xzvf rocksdb.tar.gz
+
+      - name: Build
+        run: pip install . -v
+
+      - name: Test
+        run: pytest tests/
