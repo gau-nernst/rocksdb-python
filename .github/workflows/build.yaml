@@ -16,7 +16,7 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            tag: manylinux2014_x86_64
+            tag: manylinux_x86_64
           - os: macos-latest
             tag: macosx_x86_64
           - os: windows-latest
