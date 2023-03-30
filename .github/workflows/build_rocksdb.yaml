@@ -41,7 +41,7 @@ jobs:
         env:
           PORTABLE: 1
           EXTRA_CFLAGS: -fPIC -g0
-          EXTRA_CXXFLAGS: -fPIC -g0
+          EXTRA_CXXFLAGS: -fPIC -g0 -std=c++17
 
       - name: Package
         run: |
