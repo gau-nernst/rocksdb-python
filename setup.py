@@ -4,7 +4,7 @@ import subprocess
 from glob import glob
 from pathlib import Path
 
-from pybind11.setup_helpers import Pybind11Extension
+from pybind11.setup_helpers import ParallelCompile, Pybind11Extension, naive_recompile
 from setuptools import setup
 
 
@@ -67,6 +67,7 @@ ext = Pybind11Extension(
     cxx_std=17,
 )
 
+ParallelCompile("NPY_NUM_BUILD_JOBS", needs_recompile=naive_recompile).install()
 setup(
     name="rocksdb-python",
     version=__version__,
