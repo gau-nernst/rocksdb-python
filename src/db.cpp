@@ -13,9 +13,12 @@ using ROCKSDB_NAMESPACE::WriteOptions;
 class PyDB
 {
 public:
-    PyDB(const Options &options, const std::string &name)
+    PyDB(const Options &options, const std::string &name, bool read_only = false)
     {
-        Status s = DB::Open(options, name, &db);
+        
+        Status s = (read_only) 
+            ? DB::OpenForReadOnly(options, name, &db)
+            : DB::Open(options, name, &db);
         if (!s.ok())
             throw std::runtime_error(s.ToString());
     }
@@ -44,7 +47,7 @@ private:
 void init_db(py::module_ &m)
 {
     py::class_<PyDB>(m, "PyDB")
-        .def(py::init<const Options &, const std::string &>())
+        .def(py::init<const Options &, const std::string &, bool>())
         .def("Put", &PyDB::Put)
         .def("Get", &PyDB::Get);
 }
